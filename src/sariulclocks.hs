@@ -1,11 +1,18 @@
 import Network.CGI
 import Text.XHtml
+import Utils.ScoresFile (readScoresFile,writeScoresFile)
+import Types.Classes
+import Types.Scores
 
 page :: Html
 page = body << h1 << "Hello World!"
 
-cgiMain :: CGI CGIResult
-cgiMain = output $ renderHtml page
+cgiMain        :: [(Class,Score)] -> ([(Class,Score)],CGI CGIResult)
+cgiMain scores = (scores, output $ renderHtml page)
 
 main :: IO ()
-main = runCGI $ handleErrors cgiMain
+main = do
+    scores <- readScoresFile
+    (newScores,cgi) <- cgiMain scores
+    writeScoresFile newScores
+    runCGI . handleErrors $ cgi

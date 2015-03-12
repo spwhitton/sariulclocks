@@ -1,3 +1,4 @@
 module Types.Scores where
 
-data Score = Score Int Int
+          --       points   seconds wasted this week
+data Score = Score Int      Int
