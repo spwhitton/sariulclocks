@@ -5,5 +5,5 @@ data Grade = GradeFive
 
 type Multiplier = Float
 
-          -- grade; class; no. Ss
-data Class = Grade  Int    Int
+                -- grade; class; no. Ss
+data Class = Class Grade  Int    Int
