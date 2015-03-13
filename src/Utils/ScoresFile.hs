@@ -18,12 +18,12 @@ scoresFromCSV     :: String -> ScoresList
 scoresFromCSV csv = foldr undefined [] (lines csv)
 
 -- read to scores-XX.csv where XX is largest timestamp
-readScoresFile :: IO ScoresList
+readScoresFile :: IO (Maybe ScoresList)
 readScoresFile = do
     curDir <- getCurrentDirectory
-    -- TODO what if there's no CSV file yet?  head will throw an exception.  handle it.
+    -- TODO what if there's no CSV file yet?  head will throw an exception.  handle it and return Nothing
     filename <- liftM (head . reverse . sort . filter isCSV) $ getDirectoryContents curDir
-    scoresFromCSV <$> readFile filename
+    Just . scoresFromCSV <$> readFile filename
   where isCSV path = takeExtension path == ".csv"
 
 -- writes to score-XX.csv where XX is unix timestamp: a simple-minded logging

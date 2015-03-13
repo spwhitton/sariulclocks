@@ -1,4 +1,4 @@
-module Data.Classes (sariulClasses) where
+module Data.Classes (zeroScores) where
 
 import Types.Classes
 
@@ -14,3 +14,6 @@ sariulClasses =
     , Class sariulGrade6     2    25
     , Class sariulGrade6     3    25
     , Class sariulGrade6     4    25 ]
+
+zeroScores :: ScoresList
+zeroScores = undefined
