@@ -27,30 +27,40 @@ instance Show Class where
 numberOfSs               :: Class -> Int
 numberOfSs (Class _ _ n) = n
 
--- rankings        :: ScoresList -> Html
--- rankings scores = table << tr << (foldr step [] scores)
---   where
---     step x xs = undefined
+-- Make the columns with rankingColumns, and then transpose them so
+-- that we can make HTML.
+
+rankings                     :: Maybe Class -> ScoresList -> Html
+rankings currentClass scores = table << foldr (\row acc -> (tr << row) +++ acc) noHtml (rankings' currentClass scores)
+
+rankings'                     :: Maybe Class -> ScoresList -> [Html]
+rankings' currentClass scores = foldr step [noHtml, noHtml, noHtml] (rankingColumns currentClass scores)
+  where
+    step (first, second, third) [firstRow, secondRow, thirdRow] =
+        [first +++ firstRow, second +++ secondRow, third +++ thirdRow]
 
 rankingColumns        :: Maybe Class -> ScoresList -> [(Html, Html, Html)]
-rankingColumns currentClass scores = foldr step [] sortedScores
+rankingColumns currentClass scores = fst $ foldr step ([], length sortedScores) sortedScores
   where
     sortedScores = reverse . sortBy (compare `on` snd) $ scores
-    step (thisClass, (Score points timeWasted)) cols =
-        ( (if   Just thisClass == currentClass
-           then bootstrapCellClass ".info"
-           else td)
-          << h2 << show thisClass
-        , td << h3 << show points
-        , (if  timeWasted >= 60
-           then bootstrapCellClass ".warning"
-           else td)
-          <<  show timeWasted
-        ) : cols
+    step (thisClass, (Score points timeWasted)) (cols, count) =
+        (( (if count <= 2
+            then bootstrapCellClass ".success"
+            else if   Just thisClass == currentClass
+                 then bootstrapCellClass ".info"
+                 else td)
+           << h2 << show thisClass
+         , td << h3 << show points
+         , (if  timeWasted >= 60
+            then bootstrapCellClass ".warning"
+            else td)
+           <<  show timeWasted
+         ) : cols, count - 1)
     maybeBorder aClass=
         if   Just aClass == currentClass
         then [htmlAttr "class" noHtml]
         else undefined
 
+-- Makes <td class="contextualClass">.
 bootstrapCellClass                 :: String -> (Html -> Html)
 bootstrapCellClass contextualClass = td ! [htmlAttr "class" (noHtml +++ contextualClass)]
