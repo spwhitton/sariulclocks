@@ -30,6 +30,10 @@ numberOfSs (Class _ _ n) = n
 -- Make the columns with rankingColumns, and then transpose them so
 -- that we can make HTML.
 
+-- Do this as two composed folds (point-free), rather than three:
+-- first one accumulates to list of three rows (each step adds to all
+-- three rows) and second turns list of three rows into Html
+
 rankings                     :: Maybe Class -> ScoresList -> Html
 rankings currentClass scores = table << foldr (\row acc -> (tr << row) +++ acc) noHtml (rankings' currentClass scores)
 
