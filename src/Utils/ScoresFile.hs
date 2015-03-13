@@ -21,9 +21,10 @@ scoresFromCSV csv = foldr undefined [] (lines csv)
 readScoresFile :: IO (Maybe ScoresList)
 readScoresFile = do
     curDir <- getCurrentDirectory
-    -- TODO what if there's no CSV file yet?  head will throw an exception.  handle it and return Nothing
-    filename <- liftM (head . reverse . sort . filter isCSV) $ getDirectoryContents curDir
-    Just . scoresFromCSV <$> readFile filename
+    filenames <- liftM (reverse . sort . filter isCSV) $ getDirectoryContents curDir
+    case filenames of
+        [] -> return Nothing
+        _  -> Just . scoresFromCSV <$> readFile (head filenames)
   where isCSV path = takeExtension path == ".csv"
 
 -- writes to score-XX.csv where XX is unix timestamp: a simple-minded logging
