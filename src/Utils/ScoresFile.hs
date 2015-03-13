@@ -12,7 +12,10 @@ import System.FilePath (takeExtension)
 import Control.Monad (liftM)
 
 scoresToCSV :: ScoresList -> String
-scoresToCSV = foldr undefined ""
+scoresToCSV = unlines . foldr step []
+  where
+    step (theClass, (Score x y)) theLines =
+                          (show theClass ++ "," ++ show x ++ "," ++ show y) : theLines
 
 scoresFromCSV     :: String -> ScoresList
 scoresFromCSV csv = foldr undefined [] (lines csv)
