@@ -6,10 +6,10 @@ import Types.Scores
 import Data.Classes
 
 page        :: ScoresList -> Html
-page scores = body << (h1 << "Hello World!") +++ rankings Nothing scores
+page scores = body << ((h1 << "Hello World!") +++ rankings Nothing scores)
 
 cgiMain        :: ScoresList -> (ScoresList, CGI CGIResult)
-cgiMain scores = (scores, output $ renderHtml (page scores))
+cgiMain scores = (scores, output $ prettyHtml (page scores))
 
 main :: IO ()
 main = do
