@@ -23,4 +23,8 @@ zeroScores :: ScoresList
 zeroScores = foldr ((:) . (,emptyScore)) [] sariulClasses
 
 lookupSariulClass                :: Int -> Int -> Class
-lookupSariulClass grade theClass = undefined
+lookupSariulClass grade theClass = (head . filter choose) sariulClasses
+  where
+    choose (Class g n _) = theClass == n && process grade == g
+    process 5 = sariulGrade5
+    process 6 = sariulGrade6
