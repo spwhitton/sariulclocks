@@ -12,10 +12,10 @@ import System.FilePath (takeExtension)
 import Control.Monad (liftM)
 
 scoresToCSV :: ScoresList -> String
-scoresToCSV = undefined
+scoresToCSV = foldr undefined undefined
 
-scoresFromCSV :: String -> ScoresList
-scoresFromCSV = undefined
+scoresFromCSV     :: String -> ScoresList
+scoresFromCSV csv = foldr undefined undefined (lines csv)
 
 -- read to scores-XX.csv where XX is largest timestamp
 readScoresFile :: IO ScoresList
