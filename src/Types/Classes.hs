@@ -4,6 +4,7 @@ import Types.Scores
 
 data Grade = GradeFive Multiplier
            | GradeSix  Multiplier
+           deriving (Eq, Ord)
 
 type Multiplier = Float
 
