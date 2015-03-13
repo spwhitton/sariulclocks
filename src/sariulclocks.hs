@@ -7,19 +7,19 @@ import Data.Classes
 import Data.List.Split (splitOn)
 
 templateInject               :: String -> Html -> String
-templateInject template body = templateBefore ++ (prettyHtml body) ++ templateAfter
+templateInject template body = templateBefore ++ (prettyHtmlFragment body) ++ templateAfter
   where
     (templateBefore:templateAfter:_) = splitOn "BODY_HERE" template
 
 page        :: ScoresList -> Html
-page scores = body << ((h1 << "Hello World!") +++ rankings Nothing scores)
+page scores = (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3) scores
 
 cgiMain                 :: String -> ScoresList -> (ScoresList, CGI CGIResult)
 cgiMain template scores = (scores, output $ templateInject template (page scores))
 
 main :: IO ()
 main = do
-    htmlTemplate <- readFile "assets/html/main.html"
+    htmlTemplate <- readFile "html/main.html"
     scores <- readScoresFile
     let scores' = case scores of
             Just s -> s
