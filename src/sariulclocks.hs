@@ -13,6 +13,8 @@ cgiMain scores = (scores, output $ renderHtml page)
 main :: IO ()
 main = do
     scores <- readScoresFile
-    (newScores, cgi) <- cgiMain scores
-    writeScoresFile newScores
+    let (newScores, cgi) = cgiMain scores
+    if scores /= newScores
+        then writeScoresFile newScores
+        else return ()
     runCGI . handleErrors $ cgi
