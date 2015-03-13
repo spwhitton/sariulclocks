@@ -3,6 +3,7 @@ module Utils.ScoresFile ( readScoresFile
 
 import Types.Scores
 import Types.Classes
+import Data.Classes
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import Control.Applicative ((<$>))
 import System.IO (readFile, writeFile)
@@ -10,6 +11,7 @@ import Data.List (sort)
 import System.Directory (getDirectoryContents, getCurrentDirectory)
 import System.FilePath (takeExtension)
 import Control.Monad (liftM)
+import Data.List.Split (splitOn)
 
 scoresToCSV :: ScoresList -> String
 scoresToCSV = unlines . foldr step []
@@ -17,8 +19,14 @@ scoresToCSV = unlines . foldr step []
     step (theClass, (Score x y)) theLines =
                           (show theClass ++ "," ++ show x ++ "," ++ show y) : theLines
 
+-- no malformed CSV handling here yet!
 scoresFromCSV     :: String -> ScoresList
-scoresFromCSV csv = foldr undefined [] (lines csv)
+scoresFromCSV csv = foldr step [] (lines csv)
+  where
+     step line scores = (theClass, Score (read scoreString) (read timeString)) : scores
+      where
+        classString:scoreString:timeString:[] = splitOn "," line
+        theClass = lookupSariulClass ((head . read) classString) ((last . read) classString)
 
 -- read to scores-XX.csv where XX is largest timestamp
 readScoresFile :: IO (Maybe ScoresList)

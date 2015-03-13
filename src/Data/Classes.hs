@@ -1,6 +1,7 @@
 {-# LANGUAGE TupleSections #-}
 
-module Data.Classes (zeroScores) where
+module Data.Classes ( zeroScores
+                    , lookupSariulClass) where
 
 import Types.Classes
 import Types.Scores
@@ -20,3 +21,6 @@ sariulClasses =
 
 zeroScores :: ScoresList
 zeroScores = foldr ((:) . (,emptyScore)) [] sariulClasses
+
+lookupSariulClass                :: Int -> Int -> Class
+lookupSariulClass grade theClass = undefined
