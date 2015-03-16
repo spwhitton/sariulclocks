@@ -46,7 +46,6 @@ cgiMain = do
             _      -> zeroScores
 
     clockTime <- liftIO getClockTime
-    calendarTime <- liftIO . toCalendarTime $ clockTime
 
     output $ templateInject htmlTemplate (page scores)
 
