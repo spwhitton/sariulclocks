@@ -5,6 +5,7 @@ import Types.Classes
 import Types.Scores
 import Data.Classes
 import Data.List.Split (splitOn)
+import System.Time (getClockTime, CalendarTime, toCalendarTime)
 
 templateInject               :: String -> Html -> String
 templateInject template body = templateBefore ++ (prettyHtmlFragment body) ++ templateAfter
@@ -14,17 +15,23 @@ templateInject template body = templateBefore ++ (prettyHtmlFragment body) ++ te
 page        :: ScoresList -> Html
 page scores = (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3) scores
 
-cgiMain                 :: String -> ScoresList -> (ScoresList, CGI CGIResult)
-cgiMain template scores = (scores, output $ templateInject template (page scores))
+cgiMain                              :: CalendarTime -> String -> ScoresList -> (ScoresList, CGI CGIResult)
+cgiMain calendarTime template scores = (scores, output $ templateInject template (page scores))
 
 main :: IO ()
 main = do
     htmlTemplate <- readFile "html/main.html"
+
+    -- handle scores file
     scores <- readScoresFile
     let scores' = case scores of
             Just s -> s
             _      -> zeroScores
-    let (newScores, cgi) = cgiMain htmlTemplate scores'
+
+    clockTime <- getClockTime
+    calendarTime <- toCalendarTime clockTime
+
+    let (newScores, cgi) = cgiMain calendarTime htmlTemplate scores'
     if scores' /= newScores
         then writeScoresFile newScores
         else return ()
