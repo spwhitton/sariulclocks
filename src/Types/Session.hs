@@ -4,6 +4,8 @@ import Types.Classes
 import Types.Clocks
 import Network.CGI.Cookie
 import System.Time
+import Data.List.Split (splitOn)
+import Data.Classes
 
 data Session = Session
     { currentClass :: Maybe Class
@@ -15,10 +17,25 @@ data Session = Session
 -- maybe the session from the state monad
 
 makeClassCookie             :: ClockTime -> Session -> Cookie
-makeClassCookie now session = undefined
+makeClassCookie now session =
+    Cookie { cookieName     = "class_cookie"
+           , cookieValue    = (show . currentClass) session
+           , cookieExpires  = Just $ endOfSchoolDay now
+           , cookieDomain   = Nothing
+           , cookiePath     = Nothing
+           , cookieSecure   = False}
 
 makeClockCookie             :: ClockTime -> Session -> Cookie
-makeClockCookie now session = undefined
+makeClockCookie now session =
+    Cookie { cookieName     = "clock_cookie"
+           , cookieValue    =
+               case currentClock session of
+               CountDownClock -> "0"
+               CountUpClock   -> "1"
+           , cookieExpires  = Just $ endOfSchoolDay now
+           , cookieDomain   = Nothing
+           , cookiePath     = Nothing
+           , cookieSecure   = False}
 
 endOfSchoolDay       :: ClockTime -> CalendarTime
 endOfSchoolDay now   = (toUTCTime . addToClockTime noTimeDiff { tdHour = hoursTilEndOfDay }) now
@@ -27,3 +44,17 @@ endOfSchoolDay now   = (toUTCTime . addToClockTime noTimeDiff { tdHour = hoursTi
                        { ctTZ = 9 * 60 * 60
                        , ctTZName = "KST"}
     hoursTilEndOfDay = 18 - ctHour koreanTime
+
+-- could use Maybe monad in the below!
+
+parseClassCookie   :: Maybe String -> Maybe Class
+parseClassCookie s =
+    case s of
+        Just s  -> parseClassCookie' s
+        Nothing -> Nothing
+
+parseClassCookie' :: String -> Maybe Class
+parseClassCookie' s =
+    case splitOn "-" s of
+        g:c:[] -> Just $ lookupSariulClass (read g) (read c)
+        _      -> Nothing

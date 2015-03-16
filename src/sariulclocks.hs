@@ -7,6 +7,10 @@ import Types.Scores
 import Data.Classes
 import Data.List.Split (splitOn)
 import System.Time (getClockTime, CalendarTime, toCalendarTime)
+import Control.Monad (liftM)
+import Data.Maybe (fromMaybe)
+import Types.Session
+import Types.Clocks
 -- import Control.Monad.Reader
 -- import Control.Monad.State
 -- import System.IO (stdin, stdout)
@@ -38,14 +42,25 @@ page scores = (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3)
 
 cgiMain :: CGI CGIResult
 cgiMain = do
+    -- preparatory IO: templating, scores file, time (for cookies)
+
     htmlTemplate <- (liftIO . readFile) "html/main.html"
     maybeScores <- liftIO readScoresFile
-
     let scores = case maybeScores of
             Just s -> s
             _      -> zeroScores
 
     clockTime <- liftIO getClockTime
+
+    currentClock <- liftM (fromMaybe 0) $ readCookie "clock_cookie"
+    currentClass <- liftM (parseClassCookie) $ getCookie "class_cookie"
+    let session = Session { currentClass = currentClass
+                          , currentClock =
+                              case currentClock of
+                                  0 -> CountDownClock
+                                  1 -> CountUpClock}
+
+    -- now do our CGI work
 
     output $ templateInject htmlTemplate (page scores)
 
