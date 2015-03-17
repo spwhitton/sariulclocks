@@ -70,7 +70,7 @@ clocks = do
             case leftClockType of
                 CountUpClock -> "activity-countup"
                 CountDownClock -> "activity-countdown"
-    let leftClockClock = thediv ! [strAttr "class" leftClockClockDiv] << noHtml
+    let leftClockClock = thediv ! [strAttr "id" leftClockClockDiv] << noHtml
     let leftClockButtons = makeLeftClockButtons leftClockType
     let leftClock = (<<) clockColumn $
                     (h1 << ("Activity time" +++ " " +++ leftClockToggle))
