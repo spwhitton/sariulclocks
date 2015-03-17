@@ -115,7 +115,12 @@ makePage = do
     theNavBar <- navBar
     theClocks <- clocks
     theRankings <- rankings
-    return (theNavBar +++ theClocks +++ theDate +++ theRankings)
+    currentClass <- liftM (currentClass) getSession
+    let page =
+            case currentClass of
+                Just _  -> theNavBar +++ theClocks +++ theDate +++ theRankings
+                Nothing -> theNavBar +++ br +++ theRankings +++ theDate +++ theClocks
+    return page
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -143,6 +148,9 @@ cgiMain = do
 
     setCookie $ makeClassCookie clockTime newSession
     setCookie $ makeClockCookie clockTime newSession
+
+    -- debug
+    -- let html' = html +++ (paragraph << (show cookieClock)) +++ paragraph << (show $ makeClockCookie clockTime newSession)
 
     output $ templateInject htmlTemplate html
 
