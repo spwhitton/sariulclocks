@@ -5,4 +5,4 @@
 cabal build
 cp -RL assets/* dist/build/sariulclocks.cgi/sariulclocks.cgi $HOME/html/
 # TODO: run strip on binary
-# TODO: also copy sound assets
+cp -RL ../schoolclock/sounds $HOME/html
