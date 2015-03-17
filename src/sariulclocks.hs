@@ -12,47 +12,7 @@ import Control.Monad.Trans (lift)
 import Data.Maybe (fromMaybe)
 import Types.Session
 import Types.Clocks
--- import Control.Monad.Reader
-import Control.Monad.State
--- import System.IO (stdin, stdout)
-
--- Monad stack: scores list state -> CGI -> IO.  This is mostly black
--- magic to me at this point, from
--- <https://wiki.haskell.org/Web/Literature/Practical_web_programming_in_Haskell#The_CGI_Monad>.
-
--- newtype AppT m a = App (StateT ScoresList (CGIT m) a)
---                  deriving (Monad, MonadIO, MonadState ScoresList)
--- type App a       = AppT IO a
-
--- instance MonadCGI (AppT IO) where
---     cgiAddHeader n v = App . lift $ cgiAddHeader n v
---     cgiGet x         = App . lift $ cgiGet x
-
--- -- runApp         :: App CGIResult -> IO ()
--- -- runApp (App a) = runCGIT (evalStateT a zeroScores)
-
--- End the black magic.
-
--- Page monad stack for generating the page
-
-type Page = StateT Session (State ScoresList)
-
-runPage :: Page a -> ScoresList -> Session -> (ScoresList, Session, a)
-runPage k scores session = (scores', session', a)
-  where
-    ((a, session'), scores') = runState (runStateT k session) scores
-
-putSession :: Session -> Page ()
-putSession = put
-
-getSession :: Page Session
-getSession = get
-
-getScores :: Page ScoresList
-getScores = lift get
-
-putScores :: ScoresList -> Page ()
-putScores = lift . put
+import Control.Monad.Page
 
 makePage :: Page Html
 makePage = return (h1 << "Hello World")
