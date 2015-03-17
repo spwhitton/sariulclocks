@@ -9,5 +9,4 @@ e # theClass = e ! [strAttr "class" theClass]
 e #= theClass = e ! [strAttr "id" theClass]
 
 bsButton                   :: HTML a => String -> String -> a -> Html
-bsButton id theClass label = anchor # theClass #= id
-                             << label
+bsButton id theClass label = (anchor # theClass #= id << label) +++ " "

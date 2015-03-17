@@ -132,6 +132,6 @@ cgiMain = do
 main = runCGI . handleErrors $ cgiMain
 
 templateInject               :: String -> Html -> String
-templateInject template body = templateBefore ++ (showHtmlFragment body) ++ templateAfter
+templateInject template body = templateBefore ++ (renderHtmlFragment body) ++ templateAfter
   where
     (templateBefore:templateAfter:_) = splitOn "BODY_HERE" template
