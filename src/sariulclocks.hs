@@ -20,7 +20,21 @@ navBar :: Page Html
 navBar = return $
          thediv # "navbar navbar-inverse navbar-fixed-top" ! [strAttr "role" "navigation"]
          << thediv # "container"
-         << primHtml "<div class=\"navbar-header\"> <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\"> <span class=\"sr-only\">Toggle navigation</span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> </button> <a class=\"navbar-brand\" href=\"#\">Mr Whitton's timers</a> </div>"
+         << (primHtml "<div class=\"navbar-header\"> <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\"> <span class=\"sr-only\">Toggle navigation</span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> </button> <a class=\"navbar-brand\" href=\"#\">Mr Whitton's timers</a> </div>"
+         +++ (thediv # "navbar-collapse collapse" << form # "navbar-form navbar-right" ! [strAttr "role" "form"]
+             << (   bsButton "start-lesson" "btn btn-info" "Start lesson"
+                +++ bsButton "date-toggle" "btn btn-default" ("Toggle " +++ (underline << "d") +++ "ate style")
+                +++ soundsButton)))
+  where
+    soundsButton = thediv # "btn-group"
+                   << (anchor # "btn btn-default dropdown-toggle"
+                             ! [ strAttr "data-toggle" "dropdown"
+                               , strAttr "aria-expanded" "false"
+                               , strAttr "role" "button"
+                               , strAttr "href" "#"]
+                             << ("Play sound >")
+                   +++ ulist # "dropdown-menu" ! [strAttr "role" "menu"]
+                   << li << anchor ! [strAttr "href" "#"] << "Klaxon")
 
 makeClockToggle   :: Clock -> Html
 makeClockToggle _ = bsButton "leftClockToggle" "btn btn-info" "Count up/down toggle"
