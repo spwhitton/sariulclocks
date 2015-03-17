@@ -47,7 +47,10 @@ endOfSchoolDay now   = (toUTCTime . addToClockTime noTimeDiff { tdHour = hoursTi
     koreanTime       = ((toUTCTime . addToClockTime noTimeDiff { tdHour = 9 }) now)
                        { ctTZ = 9 * 60 * 60
                        , ctTZName = "KST"}
-    hoursTilEndOfDay = 18 - ctHour koreanTime
+    hoursTilEndOfDay = if   hoursTilEndOfDay' > 0
+                       then hoursTilEndOfDay'
+                       else 1
+    hoursTilEndOfDay' = 18 - ctHour koreanTime
 
 -- could use Maybe monad in the below!
 
