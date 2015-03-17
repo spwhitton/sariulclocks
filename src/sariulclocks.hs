@@ -14,19 +14,54 @@ import Types.Session
 import Types.Clocks
 import Control.Monad.Page
 import Utils.Classes
+import Text.XHtml.Bootstrap
 
 navBar :: Page Html
 navBar = return $ paragraph << "navbar here"
 
+makeClockToggle :: Clock -> Html
+makeClockToggle = undefined
+
+makeLeftClockButtons                :: Clock -> Html
+makeLeftClockButtons CountUpClock   = undefined
+makeLeftClockButtons CountDownClock = undefined
+
+makeRightClockButtons :: Html
+makeRightClockButtons = primHtml $ "<a id=\"timeWastingClockGo\" class=\"btn btn-primary btn-lg btn-block\">Start <u>t</u>imer</a> <a id=\"timeWastingClockReset\" class=\"btn btn-default btn-lg btn-block\">Re<u>s</u>et timer (end of class)</a>"
+
 clocks :: Page Html
-clocks = return $ paragraph << "clocks here"
+clocks = do
+    leftClockType <- liftM (currentClock) getSession
+    let leftClockToggle = makeClockToggle leftClockType
+    let leftClockClockDiv =
+            case leftClockType of
+                CountUpClock -> "activity-countup"
+                CountDownClock -> "activity-countdown"
+    let leftClockClock = thediv ! [strAttr "class" leftClockClockDiv] << noHtml
+    let leftClockButtons = makeLeftClockButtons leftClockType
+    let leftClock = (<<) clockColumn $
+                    (h1 << "Activity time")
+                    +++ leftClockToggle +++ br
+                    +++ leftClockClock
+                    +++ leftClockButtons
+    let rightClock = (<<) clockColumn $
+                     (h1 << "Time wasting clock") +++ br
+                     +++ (thediv ! [strAttr "class" "time-wasting-clock"] << noHtml) +++ br
+                     +++ makeRightClockButtons
+    return $ thediv ! [strAttr "class" "container"]
+        << thediv ! [strAttr "class" "row"]
+        << (leftClock +++ rightClock)
+
+clockColumn :: Html -> Html
+clockColumn = thediv ! [strAttr "class" "col-md-6"]
 
 makePage :: Page Html
 makePage = do
     theNavBar <- navBar
     theClocks <- clocks
+    let theDate = paragraph << "date here"
     theRankings <- rankings
-    return (theNavBar +++ theClocks +++ theRankings)
+    return (theNavBar +++ theClocks +++ theDate +++ theRankings)
 
 -- makePage :: Session -> ScoresList -> (Session, ScoresList, Html)
 -- makePage session scores = (session, scores, (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3) scores)
