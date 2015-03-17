@@ -1,3 +1,42 @@
+// sound setup
+
+$.ionSound({
+    sounds: [
+        {
+            name: "klaxon"
+        },
+        {
+            name: "button_tiny",
+        },
+        {
+            name: "cheonjae",
+        },
+        {
+            name: "onetwothree",
+        },
+        {
+            name: "too_noisy",
+        },
+        {
+            name: "sit_down_quickly",
+        },
+        {
+            name: "school_bell",
+        }
+    ],
+    // volume: 0.5,
+    path: "sounds/",
+    preload: true
+});
+
+// random integers
+
+// courtesy of https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
 // famous functions from <http://www.quirksmode.org/js/cookies.html>
 
 function createCookie(name,value,days) {
@@ -53,6 +92,42 @@ function startLesson()
     location.reload(true);
 }
 
+// end a class
+
+function endLesson()
+{
+    var oldCookie = readCookie("class_cookie");
+    // bail out if we've already started a class (the cookie will
+    // always be set cos our CGI monad always sets it)
+    if (oldCookie == "Nothing")
+        return false;
+
+    // get input
+    var points = prompt("How many points did they earn?", "0");
+
+    // validate
+    var valRegExp = new RegExp("^[0-9]*$");
+    if (valRegExp.test(points) == false)
+    {
+        alert ("invalid points!");
+        return false;
+    }
+
+    // TODO: submit time wasted and points (probs. via a form in a hidden div)
+
+    // set the cookie and reload to start the session
+    timeWastingClock.reset();
+    createCookie("class_cookie", "Nothing", 1);
+    location.reload(true);
+}
+
+// choose a student
+
+function luckyNumber()
+{
+    alert("not yet");
+}
+
 // toggle the count-down and count-up clocks
 
 function leftClockToggle()
@@ -65,12 +140,204 @@ function leftClockToggle()
     location.reload(true);
 }
 
+// function to make a FlipClock with a few additional features.  Not
+// as neat a constructor as I would like because I don't fully
+// understand how jQuery works
+function MyFlipClock (jq, obj)
+{
+    var thisClock = new FlipClock(jq, obj);
+
+    thisClock.go = $.proxy(function (seconds) {
+        this.setTime(seconds);
+        this.start();
+    }, thisClock);
+    thisClock.reset = $.proxy(function () {
+        thisClock.stop();
+        thisClock.setTime(0);
+    }, thisClock);
+    thisClock.custom = $.proxy(function () {
+        var minutes = parseInt(prompt('Number of minutes', '0'));
+        var seconds = parseInt(prompt('Number of seconds', '0'));
+        thisClock.go(minutes * 60 + seconds);
+    }, thisClock);
+
+    return thisClock;
+}
+
+var timeWastingClock = MyFlipClock($('#time-wasting-clock'), {
+    autoStart:false,
+    callbacks:{
+        interval:function () {
+            $.ionSound.play("button_tiny");
+            var time = timeWastingClock.getTime().time;
+            $.jStorage.set("time_wasted", time);
+        }
+    }
+});
+timeWastingClock.setTime($.jStorage.get("time_wasted", 0));
+
+timeWastingClock.running = false;
+timeWastingClock.reset = $.proxy(function () {
+    if (this.getTime() != 1)
+    {
+        if (confirm('Are you sure?'))
+        {
+            if (this.running)
+            {
+                $('#timeWastingClockGo').html('Start <u>t</u>imer');
+                this.stop();
+                this.running = false;
+            }
+            $.jStorage.set('time_wasted', 0);
+            this.setTime(0);
+        }
+    }
+}, timeWastingClock);
+timeWastingClock.toggle = $.proxy(function () {
+    if (this.running)
+    {
+        $('#timeWastingClockGo').html('Start <u>t</u>imer');
+        this.stop();
+        this.running = false;
+    }
+    else
+    {
+        $('#timeWastingClockGo').html('Stop <u>t</u>imer');
+        this.start();
+        this.running = true;
+    }
+}, timeWastingClock);
+
+var activityClock = MyFlipClock($('#activity-countdown'), {
+    autoStart:false,
+    countdown:true,
+    callbacks:{
+        stop:function () {
+            $.ionSound.play("cheonjae");
+        }
+    }
+});
+
+var activityClockUp = MyFlipClock($('#activity-countup'), {
+    autoStart:false,
+    countdown:false
+});
+activityClockUp.toggle = $.proxy(function () {
+    if (this.running)
+    {
+        $('#activityClockUpGo').html('Start stopwatch (<u>a</u>)');
+        this.stop();
+        this.running = false;
+    }
+    else
+    {
+        $('#activityClockUpGo').html('Stop stopwatch (<u>a</u>)');
+        this.start();
+        this.running = true;
+    }
+}, activityClockUp);
+// activityClockUp.reset = $.proxy(function () {
+//     if (this.getTime() != 1)
+//     {
+//         if (confirm('Are you sure?'))
+//         {
+//             if (this.running)
+//             {
+//                 $('#activityClockUpGo').html('Start <u>t</u>imer');
+//                 this.stop();
+//                 this.running = false;
+//             }
+//             this.setTime(0);
+//         }
+//     }
+// }, activityClockUp);
+
+// bind to keys
+
+// only bind if the div exists (that is, a class is in session)
+if ($("#time-wasting-clock").length)
+{
+    $(document).bind('keydown', 't', timeWastingClock.toggle);
+    $(document).bind('keydown', 'j', timeWastingClock.toggle);
+    // $(document).bind('keydown', 'space', timeWastingClock.toggle);
+    $(document).bind('keydown', 'l', luckyNumber);
+}
+
+$(document).bind('keydown', 's', timeWastingClock.reset);
+$(document).bind('keydown', 'r', activityClock.reset);
+$(document).bind('keydown', 'c', activityClock.custom);
+
+$(document).bind('keydown', 'z', activityClockUp.reset);
+$(document).bind('keydown', 'a', activityClockUp.toggle);
+
+$(document).bind('keydown', '0', function (){activityClock.go(30);});
+$(document).bind('keydown', '1', function (){activityClock.go(60);});
+$(document).bind('keydown', '9', function (){activityClock.go(90);});
+$(document).bind('keydown', '2', function (){activityClock.go(120);});
+$(document).bind('keydown', '3', function (){activityClock.go(180);});
+$(document).bind('keydown', '4', function (){activityClock.go(240);});
+$(document).bind('keydown', '5', function (){activityClock.go(300);});
+$(document).bind('keydown', '6', function (){activityClock.go(360);});
+$(document).bind('keydown', '7', function (){activityClock.go(420);});
+$(document).bind('keydown', '8', function (){activityClock.go(480);});
+
+$(document).bind('keydown', 'k', function (){$.ionSound.play("klaxon");});
+$(document).bind('keydown', 'o', function (){$.ionSound.play("onetwothree");});
+$(document).bind('keydown', 'b', function (){$.ionSound.play("school_bell");});
+
 // bind to buttons
 
 $(document).ready(function(){
+
     $('#start-lesson').button();
     $('#start-lesson').click(function (){ startLesson(); });
 
+    $('#end-lesson').button();
+    $('#end-lesson').click(function (){ endLesson(); });
+
+    $('#lucky-number').button();
+    $('#lucky-number').click(function (){ luckyNumber(); });
+
     $('#leftClockToggle').button();
     $('#leftClockToggle').click(function (){ leftClockToggle(); });
+
+    $('#activityClockUpGo').button();
+    $('#activityClockUpGo').click(activityClockUp.toggle);
+
+    $('#activityClockUpReset').button();
+    $('#activityClockUpReset').click(activityClockUp.reset);
+
+    $('#timeWastingClockGo').button();
+    $('#timeWastingClockGo').click(timeWastingClock.toggle);
+
+    $('#timeWastingClockReset').button();
+    $('#timeWastingClockReset').click(timeWastingClock.reset);
+
+    $('#activityClockReset').button();
+    $('#activityClockReset').click(activityClock.reset);
+
+    $('#activityClockCustom').button();
+    $('#activityClockCustom').click(activityClock.custom);
+
+    $('#activityClock30s').button();
+    $('#activityClock30s').click(function (){activityClock.go(30);})
+
+    $('#activityClock60s').button();
+    $('#activityClock60s').click(function (){activityClock.go(60);})
+
+    $('#activityClock90s').button();
+    $('#activityClock90s').click(function (){activityClock.go(90);})
+
+    $('#activityClock120s').button();
+    $('#activityClock120s').click(function (){activityClock.go(120);})
+
+    $('#activityClock180s').button();
+    $('#activityClock180s').click(function (){activityClock.go(180);})
+
+    $('#activityClock240s').button();
+    $('#activityClock240s').click(function (){activityClock.go(240);})
+
+    $('#activityClock300s').button();
+    $('#activityClock300s').click(function (){activityClock.go(300);})
+
 });

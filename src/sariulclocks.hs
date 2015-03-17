@@ -17,12 +17,14 @@ import Utils.Classes
 import Text.XHtml.Bootstrap
 
 navBar :: Page Html
-navBar = return $
+navBar = do
+    currentClass <- liftM (currentClass) getSession
+    return $
          thediv # "navbar navbar-inverse navbar-fixed-top" ! [strAttr "role" "navigation"]
          << thediv # "container"
          << (primHtml "<div class=\"navbar-header\"> <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\"> <span class=\"sr-only\">Toggle navigation</span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> </button> <a class=\"navbar-brand\" href=\"#\">Mr Whitton's timers</a> </div>"
          +++ (thediv # "navbar-collapse collapse" << form # "navbar-form navbar-right" ! [strAttr "role" "form"]
-             << (   bsButton "start-lesson" "btn btn-info" "Start lesson"
+             << (   lessonButtons currentClass
                 +++ bsButton "date-toggle" "btn btn-default" ("Toggle " +++ (underline << "d") +++ "ate style")
                 +++ soundsButton)))
   where
@@ -37,12 +39,21 @@ navBar = return $
                    << ((li << anchor ! [strAttr "href" "#"] << "Klaxon")
                       +++ (li << anchor ! [strAttr "href" "#"] << "Too noisy")))
 
+lessonButtons          :: Maybe Class -> Html
+lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
+lessonButtons (Just _) = bsButton "end-lesson" "btn btn-info" "End lesson"
+                         +++ bsButton "lucky-number" "btn btn-danger" "Lucky number"
+
 makeClockToggle   :: Clock -> Html
 makeClockToggle _ = bsButton "leftClockToggle" "btn btn-info" "Count up/down toggle"
 
 makeLeftClockButtons                :: Clock -> Html
-makeLeftClockButtons CountUpClock   = stringToHtml "start, stop, reset?"
-makeLeftClockButtons CountDownClock = (paragraph # "text-center" << timeButtons)
+makeLeftClockButtons CountUpClock   = paragraph # "text-center" << controlButtons
+  where
+    controlButtons = (+++) br $ foldr (+++) noHtml $
+                      [ bsButton "activityClockUpGo" "btn btn-primary btn-lg btn-block" ("Start stopwatch (" +++ (underline << "a") +++ ")")
+                      , bsButton "activityClockUpReset" "btn btn-default btn-lg btn-block" ("Reset stopwatch (" +++ (underline << "z") +++ ")")]
+makeLeftClockButtons CountDownClock = br +++ (paragraph # "text-center" << timeButtons)
                                       +++ (paragraph # "text-center" << controlButtons)
                                       +++ (paragraph # "text-center"
                                            << "Hotkeys: press the number key for the number of minutes you want to countdown.")
@@ -60,7 +71,7 @@ makeLeftClockButtons CountDownClock = (paragraph # "text-center" << timeButtons)
                                       , bsButton "activityClockReset" "btn btn-default btn-lg" ((underline << "R") +++ "eset")]
 
 makeRightClockButtons :: Html
-makeRightClockButtons = primHtml $ "<a id=\"timeWastingClockGo\" class=\"btn btn-primary btn-lg btn-block\">Start <u>t</u>imer</a> <a id=\"timeWastingClockReset\" class=\"btn btn-default btn-lg btn-block\">Re<u>s</u>et timer (end of class)</a>"
+makeRightClockButtons = primHtml $ "<a id=\"timeWastingClockGo\" class=\"btn btn-primary btn-lg btn-block\">Start <u>t</u>imer</a> <a id=\"timeWastingClockReset\" class=\"btn btn-default btn-lg btn-block\">Re<u>s</u>et timer </a>"
 
 clocks :: Page Html
 clocks = do
@@ -81,7 +92,7 @@ clocks = do
     let rightClock = (<<) clockColumn $
                      case currentClass of
                          Just _ -> (h1 << "Time wasting clock") +++ br
-                                   +++ (thediv ! [strAttr "class" "time-wasting-clock"] << noHtml) +++ br
+                                   +++ (thediv ! [strAttr "id" "time-wasting-clock"] << noHtml) +++ br
                                    +++ makeRightClockButtons
                          Nothing -> noHtml
     return $ thediv # "container"
