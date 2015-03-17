@@ -41,6 +41,7 @@ navBar = do
 
 lessonButtons          :: Maybe Class -> Html
 lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
+                         +++ bsButton "end-of-week" "btn btn-info" "End of week"
 lessonButtons (Just _) = bsButton "end-lesson" "btn btn-info" "End lesson"
                          +++ bsButton "lucky-number" "btn btn-danger" "Lucky number"
 
