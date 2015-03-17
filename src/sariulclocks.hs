@@ -70,11 +70,18 @@ clocks = do
 clockColumn :: Html -> Html
 clockColumn = thediv ! [strAttr "class" "col-md-6"]
 
+theDate :: Html
+theDate = thediv # "row"
+          << thediv # "col-md-12"
+          << (hr
+              +++ (h1 ! [ strAttr "id" "date"
+                        , strAttr "class" "text-center"]
+                   << noHtml) +++ hr)
+
 makePage :: Page Html
 makePage = do
     theNavBar <- navBar
     theClocks <- clocks
-    let theDate = paragraph << "date here"
     theRankings <- rankings
     return (theNavBar +++ theClocks +++ theDate +++ theRankings)
 
