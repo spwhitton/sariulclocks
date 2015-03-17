@@ -63,5 +63,5 @@ parseClassCookie s =
 parseClassCookie' :: String -> Maybe Class
 parseClassCookie' s =
     case splitOn "-" s of
-        g:c:[] -> Just $ lookupSariulClass (read g) (read c)
+        g:c:[] -> lookupSariulClass (read g) (read c)
         _      -> Nothing

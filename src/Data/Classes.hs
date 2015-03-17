@@ -22,9 +22,14 @@ sariulClasses =
 zeroScores :: ScoresList
 zeroScores = foldr ((:) . (,emptyScore)) [] sariulClasses
 
-lookupSariulClass                :: Int -> Int -> Class
-lookupSariulClass grade theClass = (head . filter choose) sariulClasses
-  where
-    choose (Class g n _) = theClass == n && process grade == g
-    process 5 = sariulGrade5
-    process 6 = sariulGrade6
+lookupSariulClass                :: Int -> Int -> Maybe Class
+lookupSariulClass grade theClass = do
+    grade' <- case grade of
+        5 -> Just sariulGrade5
+        6 -> Just sariulGrade6
+        _ -> Nothing
+    let choose (Class g n _) = theClass == n && grade' == g
+        classes = filter choose sariulClasses
+    case classes of
+        []     -> Nothing
+        (x:xs) -> Just x

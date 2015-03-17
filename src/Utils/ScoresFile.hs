@@ -12,6 +12,7 @@ import System.Directory (getDirectoryContents, getCurrentDirectory)
 import System.FilePath (takeExtension)
 import Control.Monad (liftM)
 import Data.List.Split (splitOn)
+import Data.Maybe (fromJust)
 
 scoresToCSV :: ScoresList -> String
 scoresToCSV = unlines . foldr step []
@@ -26,7 +27,7 @@ scoresFromCSV csv = foldr step [] (lines csv)
      step line scores = (theClass, Score (read scoreString) (read timeString)) : scores
       where
         classString:scoreString:timeString:[] = splitOn "," line
-        theClass = lookupSariulClass ((head . read) classString) ((last . read) classString)
+        theClass = fromJust $ lookupSariulClass ((head . read) classString) ((last . read) classString)
 
 -- read to scores-XX.csv where XX is largest timestamp
 readScoresFile :: IO (Maybe ScoresList)
