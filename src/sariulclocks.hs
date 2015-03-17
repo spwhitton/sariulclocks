@@ -15,10 +15,18 @@ import Types.Clocks
 import Control.Monad.Page
 import Utils.Classes
 
+navBar :: Page Html
+navBar = return $ paragraph << "navbar here"
+
+clocks :: Page Html
+clocks = return $ paragraph << "clocks here"
+
 makePage :: Page Html
 makePage = do
+    theNavBar <- navBar
+    theClocks <- clocks
     theRankings <- rankings
-    return ((h1 << "Hello World") +++ theRankings)
+    return (theNavBar +++ theClocks +++ theRankings)
 
 -- makePage :: Session -> ScoresList -> (Session, ScoresList, Html)
 -- makePage session scores = (session, scores, (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3) scores)
