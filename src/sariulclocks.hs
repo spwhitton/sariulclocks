@@ -32,9 +32,10 @@ navBar = return $
                                , strAttr "aria-expanded" "false"
                                , strAttr "role" "button"
                                , strAttr "href" "#"]
-                             << ("Play sound >")
+                             << ("Play sound" +++ thespan # "caret" << noHtml)
                    +++ ulist # "dropdown-menu" ! [strAttr "role" "menu"]
-                   << li << anchor ! [strAttr "href" "#"] << "Klaxon")
+                   << ((li << anchor ! [strAttr "href" "#"] << "Klaxon")
+                      +++ (li << anchor ! [strAttr "href" "#"] << "Too noisy")))
 
 makeClockToggle   :: Clock -> Html
 makeClockToggle _ = bsButton "leftClockToggle" "btn btn-info" "Count up/down toggle"
