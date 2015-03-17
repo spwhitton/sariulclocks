@@ -6,6 +6,7 @@ import Network.CGI.Cookie
 import System.Time
 import Data.List.Split (splitOn)
 import Data.Classes
+import Data.Maybe (fromJust)
 
 data Session = Session
     { currentClass :: Maybe Class
@@ -19,7 +20,10 @@ data Session = Session
 makeClassCookie             :: ClockTime -> Session -> Cookie
 makeClassCookie now session =
     Cookie { cookieName     = "class_cookie"
-           , cookieValue    = (show . currentClass) session
+           , cookieValue    =
+               case currentClass session of
+                   Just c  -> show c
+                   Nothing -> "Nothing"
            , cookieExpires  = Just $ endOfSchoolDay now
            , cookieDomain   = Nothing
            , cookiePath     = Nothing

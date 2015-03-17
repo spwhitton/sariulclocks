@@ -130,6 +130,9 @@ cgiMain = do
 
     let (newScores, newSession, html) = runPage makePage scores session
 
+    setCookie $ makeClassCookie clockTime newSession
+    setCookie $ makeClockCookie clockTime newSession
+
     output $ templateInject htmlTemplate html
 
 main = runCGI . handleErrors $ cgiMain
