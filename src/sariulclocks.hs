@@ -118,11 +118,11 @@ cgiMain = do
 
     clockTime <- liftIO getClockTime
 
-    currentClock <- liftM (fromMaybe 0) $ readCookie "clock_cookie"
-    currentClass <- liftM (parseClassCookie) $ getCookie "class_cookie"
-    let session = Session { currentClass = currentClass
+    cookieClock <- liftM (fromMaybe 0) $ readCookie "clock_cookie"
+    cookieClass <- liftM (parseClassCookie) $ getCookie "class_cookie"
+    let session = Session { currentClass = cookieClass
                           , currentClock =
-                              case currentClock of
+                              case cookieClock of
                                   0 -> CountDownClock
                                   1 -> CountUpClock}
 
