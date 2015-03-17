@@ -113,12 +113,13 @@ function endLesson()
         return false;
     }
 
-    // TODO: submit time wasted and points (probs. via a form in a hidden div)
+    timeWastingClock.stop();
+    // set the form field values: the other gets set by the tick function
+    $("#class_points").val(points);
 
-    // set the cookie and reload to start the session
+    // submit the form data
     timeWastingClock.reset();
-    createCookie("class_cookie", "Nothing", 1);
-    location.reload(true);
+    $("#end_of_class_form").submit();
 }
 
 // choose a student
@@ -171,6 +172,7 @@ var timeWastingClock = MyFlipClock($('#time-wasting-clock'), {
             $.ionSound.play("button_tiny");
             var time = timeWastingClock.getTime().time;
             $.jStorage.set("time_wasted", time);
+            $("#class_time_wasted").val(time);
         }
     }
 });
