@@ -13,9 +13,12 @@ import Data.Maybe (fromMaybe)
 import Types.Session
 import Types.Clocks
 import Control.Monad.Page
+import Utils.Classes
 
 makePage :: Page Html
-makePage = return (h1 << "Hello World")
+makePage = do
+    theRankings <- rankings
+    return ((h1 << "Hello World") +++ theRankings)
 
 -- makePage :: Session -> ScoresList -> (Session, ScoresList, Html)
 -- makePage session scores = (session, scores, (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3) scores)
