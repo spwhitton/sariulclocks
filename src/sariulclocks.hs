@@ -8,11 +8,12 @@ import Data.Classes
 import Data.List.Split (splitOn)
 import System.Time (getClockTime, CalendarTime, toCalendarTime)
 import Control.Monad (liftM)
+import Control.Monad.Trans (lift)
 import Data.Maybe (fromMaybe)
 import Types.Session
 import Types.Clocks
 -- import Control.Monad.Reader
--- import Control.Monad.State
+import Control.Monad.State
 -- import System.IO (stdin, stdout)
 
 -- Monad stack: scores list state -> CGI -> IO.  This is mostly black
@@ -32,13 +33,32 @@ import Types.Clocks
 
 -- End the black magic.
 
-templateInject               :: String -> Html -> String
-templateInject template body = templateBefore ++ (prettyHtmlFragment body) ++ templateAfter
-  where
-    (templateBefore:templateAfter:_) = splitOn "BODY_HERE" template
+-- Page monad stack for generating the page
 
-page        :: ScoresList -> Html
-page scores = (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3) scores
+type Page = StateT Session (State ScoresList)
+
+runPage :: Page a -> ScoresList -> Session -> (ScoresList, Session, a)
+runPage k scores session = (scores', session', a)
+  where
+    ((a, session'), scores') = runState (runStateT k session) scores
+
+putSession :: Session -> Page ()
+putSession = put
+
+getSession :: Page Session
+getSession = get
+
+getScores :: Page ScoresList
+getScores = lift get
+
+putScores :: ScoresList -> Page ()
+putScores = lift . put
+
+makePage :: Page Html
+makePage = return (h1 << "Hello World")
+
+-- makePage :: Session -> ScoresList -> (Session, ScoresList, Html)
+-- makePage session scores = (session, scores, (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3) scores)
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -62,6 +82,13 @@ cgiMain = do
 
     -- now do our CGI work
 
-    output $ templateInject htmlTemplate (page scores)
+    let (newScores, newSession, html) = runPage makePage scores session
+
+    output $ templateInject htmlTemplate html
 
 main = runCGI . handleErrors $ cgiMain
+
+templateInject               :: String -> Html -> String
+templateInject template body = templateBefore ++ (prettyHtmlFragment body) ++ templateAfter
+  where
+    (templateBefore:templateAfter:_) = splitOn "BODY_HERE" template
