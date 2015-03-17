@@ -53,9 +53,24 @@ function startLesson()
     location.reload(true);
 }
 
+// toggle the count-down and count-up clocks
+
+function leftClockToggle()
+{
+    // determine what the current clock is by seeing what div exists
+    if ($("#activity-countup").length)
+        createCookie("clock_cookie", "0", 1);
+    else
+        createCookie("clock_cookie", "1", 1);
+    location.reload(true);
+}
+
 // bind to buttons
 
 $(document).ready(function(){
     $('#start-lesson').button();
     $('#start-lesson').click(function (){ startLesson(); });
+
+    $('#leftClockToggle').button();
+    $('#leftClockToggle').click(function (){ leftClockToggle(); });
 });
