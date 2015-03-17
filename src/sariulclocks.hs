@@ -19,12 +19,27 @@ import Text.XHtml.Bootstrap
 navBar :: Page Html
 navBar = return $ paragraph << "navbar here"
 
-makeClockToggle :: Clock -> Html
-makeClockToggle = undefined
+makeClockToggle   :: Clock -> Html
+makeClockToggle _ = bsButton "leftClockToggle" "btn btn-info" "Count up/down toggle"
 
 makeLeftClockButtons                :: Clock -> Html
-makeLeftClockButtons CountUpClock   = undefined
-makeLeftClockButtons CountDownClock = undefined
+makeLeftClockButtons CountUpClock   = stringToHtml "start, stop, reset?"
+makeLeftClockButtons CountDownClock = (paragraph # "text-center" << timeButtons)
+                                      +++ (paragraph # "text-center" << controlButtons)
+                                      +++ (paragraph # "text-center"
+                                           << "Hotkeys: press the number key for the number of minutes you want to countdown.")
+  where
+    timeButtons                     = foldr (+++) noHtml $
+                                      [ bsButton "activityClock30s"  "btn btn-primary btn-lg" ("3" +++ (underline << "0") +++ "s")
+                                      , bsButton "activityClock60s"  "btn btn-primary btn-lg" "1m"
+                                      , bsButton "activityClock90s"  "btn btn-primary btn-lg" ((underline << "9") +++ "0s")
+                                      , bsButton "activityClock120s" "btn btn-primary btn-lg" "2m"
+                                      , bsButton "activityClock180s" "btn btn-primary btn-lg" "3m"
+                                      , bsButton "activityClock240s" "btn btn-primary btn-lg" "4m"
+                                      , bsButton "activityClock300s" "btn btn-primary btn-lg" "5m" ]
+    controlButtons                  = foldr (+++) noHtml $
+                                      [ bsButton "activityClockCustom" "btn btn-default btn-lg" ((underline << "C") +++ "ustom")
+                                      , bsButton "activityClockReset" "btn btn-default btn-lg" ((underline << "R") +++ "eset")]
 
 makeRightClockButtons :: Html
 makeRightClockButtons = primHtml $ "<a id=\"timeWastingClockGo\" class=\"btn btn-primary btn-lg btn-block\">Start <u>t</u>imer</a> <a id=\"timeWastingClockReset\" class=\"btn btn-default btn-lg btn-block\">Re<u>s</u>et timer (end of class)</a>"
@@ -40,16 +55,16 @@ clocks = do
     let leftClockClock = thediv ! [strAttr "class" leftClockClockDiv] << noHtml
     let leftClockButtons = makeLeftClockButtons leftClockType
     let leftClock = (<<) clockColumn $
-                    (h1 << "Activity time")
-                    +++ leftClockToggle +++ br
+                    (h1 << ("Activity time" +++ " " +++ leftClockToggle))
+                    +++ br
                     +++ leftClockClock
                     +++ leftClockButtons
     let rightClock = (<<) clockColumn $
                      (h1 << "Time wasting clock") +++ br
                      +++ (thediv ! [strAttr "class" "time-wasting-clock"] << noHtml) +++ br
                      +++ makeRightClockButtons
-    return $ thediv ! [strAttr "class" "container"]
-        << thediv ! [strAttr "class" "row"]
+    return $ thediv # "container"
+        << thediv # "row"
         << (leftClock +++ rightClock)
 
 clockColumn :: Html -> Html
@@ -62,9 +77,6 @@ makePage = do
     let theDate = paragraph << "date here"
     theRankings <- rankings
     return (theNavBar +++ theClocks +++ theDate +++ theRankings)
-
--- makePage :: Session -> ScoresList -> (Session, ScoresList, Html)
--- makePage session scores = (session, scores, (h1 << "Hello World!") +++ rankings (Just $ lookupSariulClass 5 3) scores)
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -95,6 +107,6 @@ cgiMain = do
 main = runCGI . handleErrors $ cgiMain
 
 templateInject               :: String -> Html -> String
-templateInject template body = templateBefore ++ (prettyHtmlFragment body) ++ templateAfter
+templateInject template body = templateBefore ++ (showHtmlFragment body) ++ templateAfter
   where
     (templateBefore:templateAfter:_) = splitOn "BODY_HERE" template
