@@ -34,8 +34,8 @@ makeClockCookie now session =
     Cookie { cookieName     = "clock_cookie"
            , cookieValue    =
                case currentClock session of
-               CountDownClock -> "0"
-               CountUpClock   -> "1"
+                   CountDownClock -> "0"
+                   CountUpClock   -> "1"
            , cookieExpires  = Just $ endOfSchoolDay now
            , cookieDomain   = Nothing
            , cookiePath     = Nothing
