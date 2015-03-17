@@ -8,6 +8,7 @@ import Types.Scores
 import Utils.Xhtml
 import Data.List (sortBy)
 import Data.Function (on)
+import Text.XHtml.Bootstrap
 
 -- Make the columns with rankingColumns, and then transpose them so
 -- that we can make HTML.
@@ -24,7 +25,8 @@ rankings :: Page Html
 rankings = do
     session <- getSession
     scores <- getScores
-    return (table ! [htmlAttr "class" (noHtml +++ "table table-bordered table-centered table-chunky")]
+    return (thediv # "container" << thediv # "col-md-12" <<
+        table ! [htmlAttr "class" (noHtml +++ "table table-bordered table-centered table-chunky")]
             << foldr (\row acc -> (tr << row) +++ acc) noHtml (rankings' (currentClass session) scores))
 
 -- rankings                     :: Maybe Class -> ScoresList -> Html
