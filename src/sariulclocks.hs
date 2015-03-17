@@ -77,10 +77,13 @@ clocks = do
                     +++ br
                     +++ leftClockClock
                     +++ leftClockButtons
+    currentClass <- liftM (currentClass) getSession
     let rightClock = (<<) clockColumn $
-                     (h1 << "Time wasting clock") +++ br
-                     +++ (thediv ! [strAttr "class" "time-wasting-clock"] << noHtml) +++ br
-                     +++ makeRightClockButtons
+                     case currentClass of
+                         Just _ -> (h1 << "Time wasting clock") +++ br
+                                   +++ (thediv ! [strAttr "class" "time-wasting-clock"] << noHtml) +++ br
+                                   +++ makeRightClockButtons
+                         Nothing -> noHtml
     return $ thediv # "container"
         << thediv # "row"
         << (leftClock +++ rightClock)
