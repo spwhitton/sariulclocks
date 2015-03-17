@@ -74,7 +74,7 @@ clockColumn :: Html -> Html
 clockColumn = thediv ! [strAttr "class" "col-md-6"]
 
 theDate :: Html
-theDate = thediv # "row"
+theDate = thediv # "container" << thediv # "row"
           << thediv # "col-md-12"
           << (hr
               +++ (h1 ! [ strAttr "id" "date"
