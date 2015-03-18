@@ -90,7 +90,7 @@ function startLesson()
     // set the cookie and reload to start the session
     createCookie("class_cookie", cookieString, 1);
     // reload, preventing Firefox from resubmitting POST data
-    window.location.assign(document.URL);
+    window.location.assign(document.URL.split("#")[0]);
 }
 
 // end a class
@@ -193,7 +193,7 @@ function leftClockToggle()
         createCookie("clock_cookie", "1", 1);
 
     // reload, preventing Firefox from resubmitting POST data
-    window.location.assign(document.URL);
+    window.location.assign(document.URL.split("#")[0]);
 }
 
 // function to make a FlipClock with a few additional features.  Not
