@@ -6,8 +6,8 @@
 
 # 1. choose where to deploy
 
-live="~/html/sariul"
-devel="~/html/sariul-devel"
+live="$HOME/html/sariul"
+devel="$HOME/html/sariul-devel"
 
 if [ "$1" = "live" ]; then
     dest="$live"
