@@ -7,7 +7,7 @@ import Types.Scores
 import Data.Classes
 import Data.List.Split (splitOn)
 import System.Time (getClockTime, CalendarTime, toCalendarTime)
-import Control.Monad (liftM)
+import Control.Monad (liftM, when)
 import Control.Monad.Trans (lift)
 import Data.Maybe (fromMaybe)
 import Types.Session
@@ -15,6 +15,9 @@ import Types.Clocks
 import Control.Monad.Page
 import Utils.Classes
 import Text.XHtml.Bootstrap
+import Control.Exception (onException)
+import Data.Char (isDigit)
+import Data.Maybe (fromJust)
 
 navBar :: Page Html
 navBar = do
@@ -41,7 +44,7 @@ navBar = do
 
 lessonButtons          :: Maybe Class -> Html
 lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
-                         +++ bsButton "end-of-week" "btn btn-info" "End of week"
+                         +++ bsButton "end-of-week" "btn btn-default" "End of week"
 lessonButtons (Just _) = bsButton "end-lesson" "btn btn-info" "End lesson"
                          +++ bsButton "lucky-number" "btn btn-danger" "Lucky number"
 
@@ -111,12 +114,18 @@ theDate = thediv # "container" << thediv # "row"
                         , strAttr "class" "text-center"]
                    << noHtml) +++ hr)
 
+forms :: Page Html
+forms = do
+    let html = form #= "end_of_class_form" ! [strAttr "method" "POST"] << (input #= "class_points" ! [strAttr "name" "class_points", strAttr "type" "hidden", strAttr "value" ""] +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""])
+    return html
+
 makePage :: Page Html
 makePage = do
     theNavBar <- navBar
     theClocks <- clocks
     theRankings <- rankings
-    return (theNavBar +++ theClocks +++ theDate +++ theRankings)
+    theForms <- forms
+    return (theNavBar +++ theClocks +++ theDate +++ theRankings +++ theForms)
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -130,9 +139,15 @@ cgiMain = do
 
     clockTime <- liftIO getClockTime
 
+    points <- liftM (fromMaybe "0") $ getInput "class_points"
+    timeWasted <- liftM (fromMaybe "0") $ getInput "class_time_wasted"
+    let points' = readInt points
+    let timeWasted' = readInt timeWasted
+
     cookieClock <- liftM (fromMaybe 0) $ readCookie "clock_cookie"
     cookieClass <- liftM (parseClassCookie) $ getCookie "class_cookie"
-    let session = Session { currentClass = cookieClass
+
+    let session = Session { currentClass = if points' /= 0 then Nothing else cookieClass
                           , currentClock =
                               case cookieClock of
                                   0 -> CountDownClock
@@ -140,10 +155,24 @@ cgiMain = do
 
     -- now do our CGI work
 
-    let (newScores, newSession, html) = runPage makePage scores session
+    -- TODO: password!  read it from a file
+
+    -- TODO: so that can input password without it being echoed,
+    -- unhide the form
+
+    let scores' =
+            if   points' /= 0
+            then updateScore scores (fromJust cookieClass) points' timeWasted'
+            else scores
+
+    let (newScores, newSession, html) = runPage makePage scores' session
 
     setCookie $ makeClassCookie clockTime newSession
     setCookie $ makeClockCookie clockTime newSession
+
+    -- let html' = html +++ show points' +++ show timeWasted'
+
+    when (newScores /= scores) $ liftIO $ writeScoresFile newScores
 
     output $ templateInject htmlTemplate html
 
@@ -153,3 +182,10 @@ templateInject               :: String -> Html -> String
 templateInject template body = templateBefore ++ (renderHtmlFragment body) ++ templateAfter
   where
     (templateBefore:templateAfter:_) = splitOn "BODY_HERE" template
+
+readInt        :: String -> Int
+readInt string = if null string'
+                 then 0
+                 else read string'
+  where
+    string' = filter isDigit string
