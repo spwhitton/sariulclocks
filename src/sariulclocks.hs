@@ -164,6 +164,9 @@ cgiMain = do
 
     -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
 
+
+    -- TODO: restore time wasting clock if password was wrong
+
     let scores' =
             if   points' /= 0 && userPassword == (unpack . strip . pack) password
             then updateScore scores (fromJust cookieClass) points' timeWasted'
