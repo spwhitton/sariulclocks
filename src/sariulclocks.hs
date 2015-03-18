@@ -160,6 +160,8 @@ cgiMain = do
     -- TODO: so that can input password without it being echoed,
     -- unhide the form
 
+    -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
+
     let scores' =
             if   points' /= 0
             then updateScore scores (fromJust cookieClass) points' timeWasted'
