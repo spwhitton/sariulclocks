@@ -96,30 +96,35 @@ function startLesson()
 
 function endLesson()
 {
+    // elements
+    var $points = $('#class_points');
+    var $form = $('#end_of_class_form');
+    var $password = $('#teachers_password');
+    var $time = $('#class_time_wasted');
+
     var oldCookie = readCookie("class_cookie");
     // bail out if we've already started a class (the cookie will
     // always be set cos our CGI monad always sets it)
     if (oldCookie == "Nothing")
         return false;
 
-    // get input
-    var points = prompt("How many points did they earn?", "0");
-
     // validate
     var valRegExp = new RegExp("^[0-9]*$");
-    if (valRegExp.test(points) == false)
+    if (valRegExp.test($points.val()) == false)
     {
         alert ("invalid points!");
         return false;
     }
+    if ($password.val() == "")
+    {
+        alert ("invalid password!");
+        return false;
+    }
 
+    // submit
     timeWastingClock.stop();
-    // set the form field values: the other gets set by the tick function
-    $("#class_points").val(points);
-
-    // submit the form data
     timeWastingClock.reset();
-    $("#end_of_class_form").submit();
+    $form.submit();
 }
 
 // toggle date style

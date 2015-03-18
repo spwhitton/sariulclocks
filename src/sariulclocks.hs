@@ -1,3 +1,4 @@
+import Data.Text (strip, unpack, pack)
 import Network.CGI
 -- import Network.CGI.Monad
 import Text.XHtml
@@ -26,7 +27,7 @@ navBar = do
          thediv # "navbar navbar-inverse navbar-fixed-top" ! [strAttr "role" "navigation"]
          << thediv # "container"
          << (primHtml "<div class=\"navbar-header\"> <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\"> <span class=\"sr-only\">Toggle navigation</span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> </button> <a class=\"navbar-brand\" href=\"#\">Mr Whitton's timers</a> </div>"
-         +++ (thediv # "navbar-collapse collapse" << form # "navbar-form navbar-right" ! [strAttr "role" "form"]
+         +++ (thediv # "navbar-collapse collapse" << form #= "end_of_class_form" # "navbar-form navbar-right" ! [strAttr "role" "form", strAttr "name" "end_of_class_form", strAttr "method" "POST"]
              << (   lessonButtons currentClass
                 +++ bsButton "date-toggle" "btn btn-default" ("Toggle " +++ (underline << "d") +++ "ate style")
                 +++ soundsButton)))
@@ -44,9 +45,11 @@ navBar = do
 
 lessonButtons          :: Maybe Class -> Html
 lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
-                         +++ bsButton "end-of-week" "btn btn-default" "End of week"
-lessonButtons (Just _) = bsButton "end-lesson" "btn btn-info" "End lesson"
-                         +++ bsButton "lucky-number" "btn btn-danger" "Lucky number"
+                         -- +++ bsButton "end-of-week" "btn btn-default" "End of week"
+lessonButtons (Just _) = primHtml "<div class=\"form-group\"> <input id=\"class_points\" name=\"class_points\" type=\"text\" placeholder=\"Points scored\" class=\"form-control\"> </div> <div class=\"form-group\"> <input type=\"password\" id=\"teachers_password\" name=\"teachers_password\" placeholder=\"Teacher's password\" class=\"form-control\"> </div> "
+                          +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""]
+                          +++ bsButton "end-lesson" "btn btn-success" "End lesson"
+                          +++ bsButton "lucky-number" "btn btn-danger" "Lucky number"
 
 makeClockToggle   :: Clock -> Html
 makeClockToggle _ = bsButton "leftClockToggle" "btn btn-info" "Count up/down toggle"
@@ -114,23 +117,24 @@ theDate = thediv # "container" << thediv # "row"
                         , strAttr "class" "text-center"]
                    << noHtml) +++ hr)
 
-forms :: Page Html
-forms = do
-    let html = form #= "end_of_class_form" ! [strAttr "method" "POST"] << (input #= "class_points" ! [strAttr "name" "class_points", strAttr "type" "hidden", strAttr "value" ""] +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""])
-    return html
+-- forms :: Page Html
+-- forms = do
+--     let html = form #= "end_of_class_form" ! [strAttr "method" "POST"] << (input #= "class_points" ! [strAttr "name" "class_points", strAttr "type" "hidden", strAttr "value" ""] +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""])
+--     return html
 
 makePage :: Page Html
 makePage = do
     theNavBar <- navBar
     theClocks <- clocks
     theRankings <- rankings
-    theForms <- forms
-    return (theNavBar +++ theClocks +++ theDate +++ theRankings +++ theForms)
+    return (theNavBar +++ theClocks +++ theDate +++ theRankings)
 
 cgiMain :: CGI CGIResult
 cgiMain = do
     -- preparatory IO: templating, scores file, time (for cookies)
 
+    password <- (liftIO . readFile) "password"
+    userPassword <- liftM (fromMaybe "") $ getInput "teachers_password"
     htmlTemplate <- (liftIO . readFile) "html/main.html"
     maybeScores <- liftIO readScoresFile
     let scores = case maybeScores of
@@ -147,7 +151,7 @@ cgiMain = do
     cookieClock <- liftM (fromMaybe 0) $ readCookie "clock_cookie"
     cookieClass <- liftM (parseClassCookie) $ getCookie "class_cookie"
 
-    let session = Session { currentClass = if points' /= 0 then Nothing else cookieClass
+    let session = Session { currentClass = if points' /= 0 && userPassword == (unpack . strip . pack) password then Nothing else cookieClass
                           , currentClock =
                               case cookieClock of
                                   0 -> CountDownClock
@@ -163,7 +167,7 @@ cgiMain = do
     -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
 
     let scores' =
-            if   points' /= 0
+            if   points' /= 0 && userPassword == (unpack . strip . pack) password
             then updateScore scores (fromJust cookieClass) points' timeWasted'
             else scores
 
