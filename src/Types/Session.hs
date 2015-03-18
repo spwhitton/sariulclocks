@@ -41,6 +41,18 @@ makeClockCookie now session =
            , cookiePath     = Nothing
            , cookieSecure   = False}
 
+makeSsCookie               :: ClockTime -> Session -> Cookie
+makeSsCookie now session =
+    Cookie { cookieName    = "ss_cookie"
+           , cookieValue    =
+               case currentClass session of
+                   Nothing -> "0"
+                   Just c -> show $ numberOfSs c
+           , cookieExpires = Just $ endOfSchoolDay now
+           , cookieDomain  = Nothing
+           , cookiePath    = Nothing
+           , cookieSecure  = False}
+
 endOfSchoolDay       :: ClockTime -> CalendarTime
 endOfSchoolDay now   = (toUTCTime . addToClockTime noTimeDiff { tdHour = hoursTilEndOfDay }) now
   where

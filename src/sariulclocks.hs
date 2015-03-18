@@ -173,6 +173,7 @@ cgiMain = do
 
     setCookie $ makeClassCookie clockTime newSession
     setCookie $ makeClockCookie clockTime newSession
+    setCookie $ makeSsCookie clockTime newSession
 
     -- let html' = html +++ show points' +++ show timeWasted'
 

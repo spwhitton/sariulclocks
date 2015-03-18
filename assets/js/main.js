@@ -178,7 +178,8 @@ toggleDateStyle();
 
 function luckyNumber()
 {
-    alert("not yet");
+    var students = parseInt(readCookie("ss_cookie"));
+    alert(getRandomInt(1, students));
 }
 
 // toggle the count-down and count-up clocks
