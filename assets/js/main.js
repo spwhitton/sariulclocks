@@ -122,6 +122,52 @@ function endLesson()
     $("#end_of_class_form").submit();
 }
 
+// toggle date style
+
+// mplungjan on stack overflow: http://stackoverflow.com/a/15397495
+function nth(d) {
+    if(d>3 && d<21) return 'th'; // thanks kennebec
+    switch (d % 10) {
+    case 1:  return "st";
+    case 2:  return "nd";
+    case 3:  return "rd";
+    default: return "th";
+    }
+}
+
+function toggleDateStyle()
+{
+    var currentDate = $('#date').html();
+    var today = new Date();
+
+    var month = "January,February,March,April,May,June,July,August,September,October,November,December"
+        .split(",")[today.getMonth()];
+    var day = "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday"
+        .split(",")[today.getDay()];
+    var date = today.getDate();
+    var British = day + " " + date + "<sup>" + nth(date) + "</sup> " + month + " " + today.getFullYear();
+    var American = day + " " + month + " " + date + "<sup>" + nth(date) + "</sup>, " + today.getFullYear();
+
+    if ($.jStorage.get("date_style", 0) == 0)
+    {
+        $('#date').html(American);
+        $.jStorage.set("date_style", 1);
+    }
+    else
+    {
+        $('#date').html(British);
+        $.jStorage.set("date_style", 0);
+    }
+}
+
+// set initial date to British style
+if ($.jStorage.get("date_style", 0) == 0)
+    $.jStorage.set("date_style", 1);
+else
+    $.jStorage.set("date_style", 0);
+toggleDateStyle();
+
+
 // choose a student
 
 function luckyNumber()
@@ -272,6 +318,8 @@ $(document).bind('keydown', 'c', activityClock.custom);
 $(document).bind('keydown', 'z', activityClockUp.reset);
 $(document).bind('keydown', 'a', activityClockUp.toggle);
 
+$(document).bind('keydown', 'd', toggleDateStyle);
+
 $(document).bind('keydown', '0', function (){activityClock.go(30);});
 $(document).bind('keydown', '1', function (){activityClock.go(60);});
 $(document).bind('keydown', '9', function (){activityClock.go(90);});
@@ -299,6 +347,9 @@ $(document).ready(function(){
 
     $('#lucky-number').button();
     $('#lucky-number').click(function (){ luckyNumber(); });
+
+    $('#date-toggle').button();
+    $('#date-toggle').click(function (){ toggleDateStyle(); });
 
     $('#leftClockToggle').button();
     $('#leftClockToggle').click(function (){ leftClockToggle(); });
