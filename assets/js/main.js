@@ -236,8 +236,8 @@ timeWastingClock.running = false;
 timeWastingClock.reset = $.proxy(function () {
     if (this.getTime() != 1)
     {
-        if (confirm('Are you sure?'))
-        {
+        // if (confirm('Are you sure?'))
+        // {
             if (this.running)
             {
                 $('#timeWastingClockGo').html('Start <u>t</u>imer');
@@ -246,7 +246,7 @@ timeWastingClock.reset = $.proxy(function () {
             }
             $.jStorage.set('time_wasted', 0);
             this.setTime(0);
-        }
+        // }
     }
 }, timeWastingClock);
 timeWastingClock.toggle = $.proxy(function () {
