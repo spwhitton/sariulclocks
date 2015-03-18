@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                sariulclocks
-version:             0.1.0.0
+version:             1.0.0
 synopsis:            Timers and reward system for teaching English at Sariul
 -- description:         
 homepage:            http://github.com/spwhitton/sariulclocks
