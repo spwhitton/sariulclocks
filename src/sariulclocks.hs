@@ -52,7 +52,7 @@ lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
 lessonButtons (Just _) = primHtml "<div class=\"form-group\"> <input id=\"class_points\" name=\"class_points\" type=\"text\" placeholder=\"Points scored\" class=\"form-control\"> </div> <div class=\"form-group\"> <input type=\"password\" id=\"teachers_password\" name=\"teachers_password\" placeholder=\"Teacher's password\" class=\"form-control\"> </div> "
                           +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""]
                           +++ bsButton "end-lesson" "btn btn-success" "End lesson"
-                          +++ bsButton "lucky-number" "btn btn-danger" "Lucky number"
+                          +++ bsButton "lucky-number" "btn btn-danger" ((underline << "L") +++ "ucky number")
 
 makeClockToggle   :: Clock -> Html
 makeClockToggle _ = bsButton "leftClockToggle" "btn btn-info" "Count up/down toggle"
@@ -163,7 +163,6 @@ cgiMain = do
     -- now do our CGI work
 
     -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
-
 
     -- TODO: restore time wasting clock if password was wrong
 
