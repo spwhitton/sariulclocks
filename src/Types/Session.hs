@@ -26,7 +26,7 @@ makeClassCookie now session =
                    Nothing -> "Nothing"
            , cookieExpires  = Just $ endOfSchoolDay now
            , cookieDomain   = Nothing
-           , cookiePath     = Nothing
+           , cookiePath     = Just "/sariul/cgi-bin"
            , cookieSecure   = False}
 
 makeClockCookie             :: ClockTime -> Session -> Cookie
@@ -38,7 +38,7 @@ makeClockCookie now session =
                    CountUpClock   -> "1"
            , cookieExpires  = Just $ endOfSchoolDay now
            , cookieDomain   = Nothing
-           , cookiePath     = Nothing
+           , cookiePath     = Just "/sariul/cgi-bin"
            , cookieSecure   = False}
 
 makeSsCookie               :: ClockTime -> Session -> Cookie
@@ -50,7 +50,8 @@ makeSsCookie now session =
                    Just c -> show $ numberOfSs c
            , cookieExpires = Just $ endOfSchoolDay now
            , cookieDomain  = Nothing
-           , cookiePath    = Nothing
+-- make the cookie path not absolute
+           , cookiePath    = Just "/sariul/cgi-bin"
            , cookieSecure  = False}
 
 endOfSchoolDay       :: ClockTime -> CalendarTime
