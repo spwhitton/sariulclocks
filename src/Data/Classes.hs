@@ -33,11 +33,3 @@ lookupSariulClass grade theClass = do
     case classes of
         []     -> Nothing
         (x:xs) -> Just x
-
--- TODO: make this take into account modified
-
-updateScore          :: ScoresList -> Class -> Int -> Int -> ScoresList
-updateScore [] _ _ _ = []
-updateScore (s@(aClass, Score x y):ss) c p t
-    | c == aClass    = (c, Score (x + p) (y + t)):ss
-    | otherwise      = s:updateScore ss c p t

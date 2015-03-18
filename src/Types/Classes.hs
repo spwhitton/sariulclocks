@@ -27,3 +27,13 @@ instance Show Class where
 
 numberOfSs               :: Class -> Int
 numberOfSs (Class _ _ n) = n
+
+getModifier                           :: Class -> Float
+getModifier (Class (GradeFive m) _ _) = m
+getModifier (Class (GradeSix  m) _ _) = m
+
+updateScore          :: ScoresList -> Class -> Int -> Int -> ScoresList
+updateScore [] _ _ _ = []
+updateScore (s@(aClass, Score x y):ss) c p t
+    | c == aClass    = (c, Score (x + (floor $ (fromIntegral p) * (getModifier aClass))) (y + t)):ss
+    | otherwise      = s:updateScore ss c p t
