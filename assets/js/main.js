@@ -347,6 +347,21 @@ $(document).bind('keydown', 'b', function (){$.ionSound.play("school_bell");});
 
 $(document).ready(function(){
 
+    $('#klaxon').button();
+    $('#klaxon').click(function (){$.ionSound.play("klaxon");});
+
+    $('#bell').button();
+    $('#bell').click(function (){$.ionSound.play("school_bell");});
+
+    $('#one-two-three').button();
+    $('#one-two-three').click(function (){$.ionSound.play("onetwothree");});
+
+    $('#too-noisy').button();
+    $('#too-noisy').click(function (){$.ionSound.play("too_noisy");});
+
+    $('#sit-down-quickly').button();
+    $('#sit-down-quickly').click(function (){$.ionSound.play("sit_down_quickly");});
+
     $('#start-lesson').button();
     $('#start-lesson').click(function (){ startLesson(); });
 

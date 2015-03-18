@@ -40,8 +40,11 @@ navBar = do
                                , strAttr "href" "#"]
                              << ("Play sound " +++ thespan # "caret" << noHtml)
                    +++ ulist # "dropdown-menu" ! [strAttr "role" "menu"]
-                   << ((li << anchor ! [strAttr "href" "#"] << "Klaxon")
-                      +++ (li << anchor ! [strAttr "href" "#"] << "Too noisy")))
+                   << ((li << anchor #= "klaxon" ! [strAttr "href" "#"] << "Klaxon")
+                       +++ (li << anchor #= "bell" ! [strAttr "href" "#"] << "Bell")
+                       +++ (li << anchor #= "one-two-three" ! [strAttr "href" "#"] << "One, two, three")
+                      +++ (li << anchor #= "too-noisy" ! [strAttr "href" "#"] << "Too noisy")
+                      +++ (li << anchor #= "sit-down-quickly" ! [strAttr "href" "#"] << "Sit down quickly")))
 
 lessonButtons          :: Maybe Class -> Html
 lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
