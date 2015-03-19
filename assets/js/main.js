@@ -46,7 +46,8 @@ function createCookie(name,value,days) {
         var expires = "; expires="+date.toGMTString();
     }
     else var expires = "";
-    document.cookie = name+"="+value+expires+"; path=/";
+    // TODO: make this not absolute
+    document.cookie = name+"="+value+expires+"; path=/sariul/cgi-bin";
 }
 
 function readCookie(name) {
@@ -89,6 +90,9 @@ function startLesson()
 
     // set the cookie and reload to start the session
     createCookie("class_cookie", cookieString, 1);
+    // reset clock because it's currently dangerous to do so when
+    // ending a lesson
+    timeWastingClock.reset();
     // reload, preventing Firefox from resubmitting POST data
     window.location.assign(document.URL.split("#")[0]);
 }
@@ -124,7 +128,9 @@ function endLesson()
 
     // submit
     timeWastingClock.stop();
-    timeWastingClock.reset();
+    // dangerous to reset clock here in case user inputs wrong
+    // password: instead reset when *starting* a class
+    // timeWastingClock.reset();
     $form.submit();
 }
 

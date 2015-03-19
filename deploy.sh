@@ -6,8 +6,8 @@
 
 # 1. choose where to deploy
 
-live="$HOME/html/sariul"
-devel="$HOME/html/sariul-devel"
+live="$HOME/html/sariul/cgi-bin"
+devel="$HOME/html/sariul-devel/cgi-bin"
 
 if [ "$1" = "live" ]; then
     dest="$live"
@@ -45,6 +45,10 @@ cp -RL ../schoolclock/sounds $dest
 cd $HOME
 # mkhomepg -p
 mkdir -p $dest/data
+if ! [ -e "$dest/password" ]; then
+    echo "dummy_password" > $dest/password
+    echo "Please update password in $dest/password!"
+fi
 chmod 777 $dest/data
 chmod 755 $dest/sariulclocks.cgi
 
