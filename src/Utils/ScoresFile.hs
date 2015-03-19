@@ -21,6 +21,8 @@ scoresToCSV = unlines . foldr step []
     step (theClass, (Score x y)) theLines =
                           (show theClass ++ "," ++ show x ++ "," ++ show y) : theLines
 
+-- TODO: back these up
+
 -- no malformed CSV handling here yet!
 -- this function currently doesn't work
 scoresFromCSV     :: String -> ScoresList
