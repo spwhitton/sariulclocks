@@ -3,10 +3,13 @@
 module Control.Monad.SariulClocks ( SariulScoresMonad
                                   , SariulClocksCGI
                                   , SariulClocksIO
+                                  , runSariulClocksCGI
+                                  , runSariulClocksIO
                                   , putSession
                                   , getSession
                                   , putScores
-                                  , getScores) where
+                                  , getScores
+                                  , modifyScores) where
 
 import Control.Monad (liftM)
 import Control.Monad.Trans (MonadIO, lift)
@@ -22,6 +25,12 @@ class ( Monad a
       , MonadIO a) => SariulScoresMonad a where
     putScores       :: ScoresList -> a ()
     getScores       :: a ScoresList
+    modifyScores    :: (ScoresList -> ScoresList) -> a ()
+    modifyScores f  = do
+        scores <- getScores
+        let scores' = f scores
+        putScores scores
+        return ()
 
 newtype SariulClocksCGI a =
     SCC { getSCC :: StateT (Session, ScoresList) (CGIT IO) a }
