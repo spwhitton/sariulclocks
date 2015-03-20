@@ -13,6 +13,10 @@ data Session = Session
     , currentClock :: Clock }
     deriving (Eq)
 
+freshSession :: Session
+freshSession = Session { currentClass = Nothing
+                       , currentClock = CountDownClock }
+
 -- If we were using a proper monad stack, this should be of type App
 -- Cookie where it uses the reader monad to get the CalendarTime and
 -- maybe the session from the state monad
