@@ -1,3 +1,7 @@
+// compile regular expressions
+
+var numRegExp = new RegExp("^[0-9]*$");
+
 // sound setup
 
 $.ionSound({
@@ -120,8 +124,8 @@ function endLesson()
         return false;
 
     // validate
-    var valRegExp = new RegExp("^[0-9]*$");
-    if (valRegExp.test($points.val()) == false)
+    var numRegExp = new RegExp("^[0-9]*$");
+    if (numRegExp.test($points.val()) == false)
     {
         alert ("invalid points!");
         return false;
@@ -224,9 +228,14 @@ function MyFlipClock (jq, obj)
         thisClock.setTime(0);
     }, thisClock);
     thisClock.custom = $.proxy(function () {
-        var minutes = parseInt(prompt('Number of minutes', '0'));
-        var seconds = parseInt(prompt('Number of seconds', '0'));
-        thisClock.go(minutes * 60 + seconds);
+        var minutes = prompt('Number of minutes', '0');
+        var seconds = prompt('Number of seconds', '0');
+
+        // validate
+        if (numRegExp.test(minutes) == false || numRegExp.test(seconds) == false)
+            alert ("invalid input");
+        else
+            thisClock.go(parseInt(minutes) * 60 + parseInt(seconds));
     }, thisClock);
 
     return thisClock;
