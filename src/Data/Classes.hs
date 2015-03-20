@@ -6,7 +6,8 @@ module Data.Classes ( zeroScores
 import Types.Classes
 import Types.Scores
 
-sariulGrade5 = GradeFive 1.5
+-- sariulGrade5 = GradeFive 1.5
+sariulGrade5 = GradeFive 1
 sariulGrade6 = GradeSix  1
 
 sariulClasses :: [Class]
