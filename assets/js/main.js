@@ -22,6 +22,12 @@ $.ionSound({
         },
         {
             name: "school_bell",
+        },
+        {
+            name: "why_so_noisy",
+        },
+        {
+            name: "new_cheonjae",
         }
     ],
     // volume: 0.5,
@@ -276,7 +282,7 @@ var activityClock = MyFlipClock($('#activity-countdown'), {
     countdown:true,
     callbacks:{
         stop:function () {
-            $.ionSound.play("cheonjae");
+            $.ionSound.play("new_cheonjae");
         }
     }
 });
@@ -353,6 +359,9 @@ $(document).bind('keydown', 'b', function (){$.ionSound.play("school_bell");});
 // bind to buttons
 
 $(document).ready(function(){
+
+    $('#why-so-noisy').button();
+    $('#why-so-noisy').click(function (){$.ionSound.play("why_so_noisy");});
 
     $('#klaxon').button();
     $('#klaxon').click(function (){$.ionSound.play("klaxon");});

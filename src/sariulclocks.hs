@@ -42,9 +42,14 @@ navBar = do
                    +++ ulist # "dropdown-menu" ! [strAttr "role" "menu"]
                    << ((li << anchor #= "klaxon" ! [strAttr "href" "#"] << "Klaxon")
                        +++ (li << anchor #= "bell" ! [strAttr "href" "#"] << "Bell")
+                       +++ (li # "divider" << noHtml)
+                       +++ (li # "dropdown-header" << "Sean")
                        +++ (li << anchor #= "one-two-three" ! [strAttr "href" "#"] << "One, two, three")
                       +++ (li << anchor #= "too-noisy" ! [strAttr "href" "#"] << "Too noisy")
-                      +++ (li << anchor #= "sit-down-quickly" ! [strAttr "href" "#"] << "Sit down quickly")))
+                      +++ (li << anchor #= "sit-down-quickly" ! [strAttr "href" "#"] << "Sit down quickly")
+                       +++ (li # "divider" << noHtml)
+                       +++ (li # "dropdown-header" << "은아")
+                      +++ (li << anchor #= "why-so-noisy" ! [strAttr "href" "#"] << "Why are you so noisy?")))
 
 lessonButtons          :: Maybe Class -> Html
 lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
