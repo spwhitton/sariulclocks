@@ -1,6 +1,7 @@
 {-# LANGUAGE TupleSections #-}
 
 module Data.Classes ( zeroScores
+                    , testScores
                     , lookupSariulClass) where
 
 import Types.Classes
@@ -34,3 +35,15 @@ lookupSariulClass grade theClass = do
     case classes of
         []     -> Nothing
         (x:xs) -> Just x
+
+--- test data
+
+testScores :: ScoresList
+testScores = zip sariulClasses
+             [ Score 408 7
+             , Score 455 7
+             , Score 383 91
+             , Score 256 56
+             , Score 277 101
+             , Score 308 43
+             , Score 303 2]
