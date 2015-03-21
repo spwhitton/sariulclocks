@@ -1,8 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+
+import           Control.Applicative        ((<$>))
 import           Control.Monad              (liftM, when)
 import           Control.Monad.SariulClocks
 import           Control.Monad.Trans        (liftIO)
 import           Data.Classes
+import           Data.Function              (on)
+import           Data.List                  (sortBy)
 import           Data.Maybe                 (fromJust)
 import           Text.PrettyPrint.Boxes
 import           Types.Classes
@@ -12,7 +16,19 @@ import           Utils.ScoresFile
 --- meaty functions
 
 weeklyCron        :: ScoresList -> ScoresList
-weeklyCron scores = undefined
+weeklyCron scores = (resetTime . deductPoints 10) <$> take 3 sortedScores
+                    ++ drop 3 sortedScores
+  where
+    sortedScores  = sortBy (compare `on` (scoreTimeWasted . snd)) scores
+
+scoreTimeWasted             :: Score -> Int
+scoreTimeWasted (Score _ x) = x
+
+deductPoints                  :: Int -> (Class, Score) -> (Class, Score)
+deductPoints n (c, Score x y) = (c, Score (x - n) y)
+
+resetTime                :: (Class, Score) -> (Class, Score)
+resetTime (c, Score x _) = (c, Score x 0)
 
 main :: IO ()
 main = runSariulClocksIO $ do
