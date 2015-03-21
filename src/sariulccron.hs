@@ -21,8 +21,7 @@ weeklyCron        :: ScoresList -> ScoresList
 weeklyCron scores = ((resetTime . deductPoints 10) <$> take 3 sortedScores)
                     ++ (resetTime <$> drop 3 sortedScores)
   where
-    sortedScores  = reverse $
-                    sortBy (compare `on` (scoreTimeWasted . snd)) scores
+    sortedScores  = sortBy (flip $ (compare `on` (scoreTimeWasted . snd))) scores
 
 scoreTimeWasted             :: Score -> Int
 scoreTimeWasted (Score _ x) = x
