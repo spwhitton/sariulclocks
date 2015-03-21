@@ -28,11 +28,7 @@ class ( Monad a
     putScores       :: ScoresList -> a ()
     getScores       :: a ScoresList
     modifyScores    :: (ScoresList -> ScoresList) -> a ()
-    modifyScores f  = do
-        scores <- getScores
-        let scores' = f scores
-        putScores scores
-        return ()
+    modifyScores f  = liftM f getScores >>= putScores
 
 newtype SariulClocksCGI a =
     SCC { getSCC :: StateT (Session, ScoresList) (CGIT IO) a }
