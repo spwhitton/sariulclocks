@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Control.Monad.SariulClocks ( SariulScoresMonad
@@ -11,15 +12,15 @@ module Control.Monad.SariulClocks ( SariulScoresMonad
                                   , getScores
                                   , modifyScores) where
 
-import Control.Monad (liftM)
-import Control.Monad.Trans (MonadIO, lift)
-import Control.Monad.State (StateT, MonadState, get, put, evalStateT)
-import Types.Session
-import Types.Scores
-import Types.Classes
-import Data.Classes
-import Network.CGI.Monad (CGIT, MonadCGI, cgiAddHeader, cgiGet)
-import Network.CGI (runCGI, handleErrors, CGIResult)
+import           Control.Monad       (liftM)
+import           Control.Monad.State (MonadState, StateT, evalStateT, get, put)
+import           Control.Monad.Trans (MonadIO, lift)
+import           Data.Classes
+import           Network.CGI         (CGIResult, handleErrors, runCGI)
+import           Network.CGI.Monad   (CGIT, MonadCGI, cgiAddHeader, cgiGet)
+import           Types.Classes
+import           Types.Scores
+import           Types.Session
 
 class ( Monad a
       , MonadIO a) => SariulScoresMonad a where
@@ -34,11 +35,11 @@ class ( Monad a
 
 newtype SariulClocksCGI a =
     SCC { getSCC :: StateT (Session, ScoresList) (CGIT IO) a }
-    deriving (Monad, MonadIO, MonadState (Session, ScoresList))
+    deriving (Functor, Applicative, Monad, MonadIO, MonadState (Session, ScoresList))
 
 newtype SariulClocksIO a =
     SCI { getSCI :: StateT ScoresList IO a }
-    deriving (Monad, MonadIO, MonadState ScoresList)
+    deriving (Functor, Applicative, Monad, MonadIO, MonadState ScoresList)
 
 instance MonadCGI SariulClocksCGI where
     cgiAddHeader n v = SCC . lift $ cgiAddHeader n v
