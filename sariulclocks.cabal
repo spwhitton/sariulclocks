@@ -18,7 +18,7 @@ cabal-version:       >=1.10
 
 executable sariulclocks.cgi
   main-is:             sariulccgi.hs
-  build-depends:       base, cgi, xhtml, time, directory, filepath, split, old-time, mtl, text
+  build-depends:       base, cgi, xhtml, time, directory, filepath, split, old-time, mtl, text, boxes
   hs-source-dirs:      src
   default-language:    Haskell2010
   ld-options:          -static -pthread
