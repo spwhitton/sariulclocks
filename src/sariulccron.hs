@@ -35,6 +35,7 @@ resetTime (c, Score x _) = (c, Score x 0)
 
 main :: IO ()
 main = runSariulClocksIO $ do
+    -- TODO: error handling if no cmd line supplied!
     liftIO $ liftM head getArgs >>= setCurrentDirectory
     scores <- readScoresFile
     -- Proceed only if we actually read some scores.
