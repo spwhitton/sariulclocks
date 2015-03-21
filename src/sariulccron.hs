@@ -16,10 +16,11 @@ import           Utils.ScoresFile
 --- meaty functions
 
 weeklyCron        :: ScoresList -> ScoresList
-weeklyCron scores = (resetTime . deductPoints 10) <$> take 3 sortedScores
-                    ++ drop 3 sortedScores
+weeklyCron scores = ((resetTime . deductPoints 10) <$> take 3 sortedScores)
+                    ++ (resetTime <$> drop 3 sortedScores)
   where
-    sortedScores  = sortBy (compare `on` (scoreTimeWasted . snd)) scores
+    sortedScores  = reverse $
+                    sortBy (compare `on` (scoreTimeWasted . snd)) scores
 
 scoreTimeWasted             :: Score -> Int
 scoreTimeWasted (Score _ x) = x
