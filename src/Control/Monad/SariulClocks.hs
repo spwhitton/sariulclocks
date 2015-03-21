@@ -10,11 +10,12 @@ module Control.Monad.SariulClocks ( SariulScoresMonad
                                   , getSession
                                   , putScores
                                   , getScores
-                                  , modifyScores) where
+                                  , modifyScores
+                                  , printLn) where
 
 import           Control.Monad       (liftM)
 import           Control.Monad.State (MonadState, StateT, evalStateT, get, put)
-import           Control.Monad.Trans (MonadIO, lift)
+import           Control.Monad.Trans (MonadIO, lift, liftIO)
 import           Data.Classes
 import           Network.CGI         (CGIResult, handleErrors, runCGI)
 import           Network.CGI.Monad   (CGIT, MonadCGI, cgiAddHeader, cgiGet)
@@ -70,3 +71,6 @@ runSariulClocksCGI k =
 
 runSariulClocksIO  :: SariulClocksIO () -> IO ()
 runSariulClocksIO k = evalStateT (getSCI k) zeroScores
+
+printLn :: String -> SariulClocksIO ()
+printLn x = liftIO $ putStrLn $ x

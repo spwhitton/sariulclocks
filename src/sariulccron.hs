@@ -17,15 +17,17 @@ weeklyCron scores = undefined
 main :: IO ()
 main = runSariulClocksIO $ do
     scores <- readScoresFile
+    -- Proceed only if we actually read some scores.
     when (isJust scores) $ do
         modifyScores weeklyCron
         shouldModify <- liftM (((/=) scores) . Just) getScores
-        liftIO $ putStrLn "Scores before:\n"
-        liftIO $ putStrLn . ppScores $ fromJust scores
-        liftIO $ putStrLn "Scores after:\n"
-        scores' <- getScores
-        liftIO $ putStrLn . ppScores $ scores'
-        when shouldModify writeScoresFile
+
+        when shouldModify $ do
+            writeScoresFile
+
+            -- Output what we did to be e-mailed from crond.
+            liftM (scoresBeforeAfter (fromJust scores)) getScores
+                >>= printLn
 
 --- utility functions
 
@@ -44,6 +46,9 @@ classBox (c, (Score x y)) = hsep 3 left
                             [ alignHoriz center1 7  $ (text . show) c
                             , alignHoriz center1 7  $ (text . show) x
                             , alignHoriz center1 12 $ (text . show) y]
+
+scoresBeforeAfter     :: ScoresList -> ScoresList -> String
+scoresBeforeAfter x y = "Scores before:\n\n" ++ ppScores x ++ "\nScores after:\n\n" ++ ppScores y
 
 isJust          :: Maybe a -> Bool
 isJust (Just _) = True
