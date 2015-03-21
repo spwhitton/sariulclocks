@@ -25,6 +25,12 @@ mkdir -p $dest
 
 # 2. build our software
 
+if ! [ -d "$HOME/.cabal/config" ]; then
+    mkcabalc
+fi
+if ! [ -d "$HOME/.cabal/packages" ]; then
+    cabal update
+fi
 if ! [ -d ".cabal-sandbox" ]; then
     cabal sandbox init
 fi
