@@ -45,6 +45,11 @@ cabal build
 cp -RL assets/* assets/.htaccess dist/build/sariulclocks.cgi/sariulclocks.cgi $dest
 # TODO: run strip on binary
 cp -RL ../schoolclock/sounds $dest
+if [ "$1" = "live" ]; then
+    mkdir -p $HOME/local/bin
+    cp dist/build/sariulccron/sariulccron $HOME/local/bin
+fi
+# TODO: add to demeter crontab (after devel gets merged to master)
 
 # 4. further permissions & dirs
 
