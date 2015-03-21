@@ -8,6 +8,8 @@ import           Data.Classes
 import           Data.Function              (on)
 import           Data.List                  (sortBy)
 import           Data.Maybe                 (fromJust)
+import           System.Directory           (setCurrentDirectory)
+import           System.Environment         (getArgs)
 import           Text.PrettyPrint.Boxes
 import           Types.Classes
 import           Types.Scores
@@ -33,6 +35,7 @@ resetTime (c, Score x _) = (c, Score x 0)
 
 main :: IO ()
 main = runSariulClocksIO $ do
+    liftIO $ liftM head getArgs >>= setCurrentDirectory
     scores <- readScoresFile
     -- Proceed only if we actually read some scores.
     when (isJust scores) $ do
