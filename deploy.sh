@@ -20,7 +20,7 @@ else
     fi
 fi
 
-cd ~/src/sariulclocks
+cd $HOME/src/sariulclocks
 mkdir -p $dest
 
 # 2. build our software
