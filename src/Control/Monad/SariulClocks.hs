@@ -32,11 +32,11 @@ class ( Monad a
 
 newtype SariulClocksCGI a =
     SCC { getSCC :: StateT (Session, ScoresList) (CGIT IO) a }
-    deriving (Functor, Applicative, Monad, MonadIO, MonadState (Session, ScoresList))
+    deriving (Functor, Monad, MonadIO, MonadState (Session, ScoresList))
 
 newtype SariulClocksIO a =
     SCI { getSCI :: StateT ScoresList IO a }
-    deriving (Functor, Applicative, Monad, MonadIO, MonadState ScoresList)
+    deriving (Functor, Monad, MonadIO, MonadState ScoresList)
 
 instance MonadCGI SariulClocksCGI where
     cgiAddHeader n v = SCC . lift $ cgiAddHeader n v
