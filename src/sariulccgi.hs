@@ -19,6 +19,7 @@ import Text.XHtml.Bootstrap
 import Control.Exception (onException)
 import Data.Char (isDigit)
 import Data.Maybe (fromJust)
+import Utils.Xhtml
 
 navBar :: Page Html
 navBar = do
@@ -29,7 +30,7 @@ navBar = do
          << (primHtml "<div class=\"navbar-header\"> <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\"> <span class=\"sr-only\">Toggle navigation</span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> </button> <a class=\"navbar-brand\" href=\"#\">Mr Whitton's timers</a> </div>"
          +++ (thediv # "navbar-collapse collapse" << form #= "end_of_class_form" # "navbar-form navbar-right" ! [strAttr "role" "form", strAttr "name" "end_of_class_form", strAttr "method" "POST"]
              << (   lessonButtons currentClass
-                +++ bsButton "date-toggle" "btn btn-default" ("Toggle " +++ (underline << "d") +++ "ate style")
+                +++ bsButton "date-toggle" "btn btn-default" ("Toggle " +++ uC 'd' +++ "ate style")
                 +++ soundsButton)))
   where
     soundsButton = thediv # "btn-group"
@@ -57,7 +58,7 @@ lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
 lessonButtons (Just _) = primHtml "<div class=\"form-group\"> <input id=\"class_points\" name=\"class_points\" type=\"text\" placeholder=\"Points scored\" class=\"form-control\"> </div> <div class=\"form-group\"> <input type=\"password\" id=\"teachers_password\" name=\"teachers_password\" placeholder=\"Teacher's password\" class=\"form-control\"> </div> "
                           +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""]
                           +++ bsButton "end-lesson" "btn btn-success" "End lesson"
-                          +++ bsButton "lucky-number" "btn btn-danger" ((underline << "L") +++ "ucky number")
+                          +++ bsButton "lucky-number" "btn btn-danger" (uC 'L' +++ "ucky number")
 
 makeClockToggle   :: Clock -> Html
 makeClockToggle _ = bsButton "leftClockToggle" "btn btn-info" "Count up/down toggle"
@@ -66,24 +67,24 @@ makeLeftClockButtons                :: Clock -> Html
 makeLeftClockButtons CountUpClock   = paragraph # "text-center" << controlButtons
   where
     controlButtons = (+++) br $ foldr (+++) noHtml $
-                      [ bsButton "activityClockUpGo" "btn btn-primary btn-lg btn-block" ("Start stopwatch (" +++ (underline << "a") +++ ")")
-                      , bsButton "activityClockUpReset" "btn btn-default btn-lg btn-block" ("Reset stopwatch (" +++ (underline << "z") +++ ")")]
+                      [ bsButton "activityClockUpGo" "btn btn-primary btn-lg btn-block" ("Start stopwatch (" +++ uC 'a' +++ ")")
+                      , bsButton "activityClockUpReset" "btn btn-default btn-lg btn-block" ("Reset stopwatch (" +++ uC 'z' +++ ")")]
 makeLeftClockButtons CountDownClock = br +++ (paragraph # "text-center" << timeButtons)
                                       +++ (paragraph # "text-center" << controlButtons)
                                       +++ (paragraph # "text-center"
                                            << "Hotkeys: press the number key for the number of minutes you want to countdown.")
   where
     timeButtons                     = foldr (+++) noHtml $
-                                      [ bsButton "activityClock30s"  "btn btn-primary btn-lg" ("3" +++ (underline << "0") +++ "s")
+                                      [ bsButton "activityClock30s"  "btn btn-primary btn-lg" ("3" +++ (uC '0') +++ "s")
                                       , bsButton "activityClock60s"  "btn btn-primary btn-lg" "1m"
-                                      , bsButton "activityClock90s"  "btn btn-primary btn-lg" ((underline << "9") +++ "0s")
+                                      , bsButton "activityClock90s"  "btn btn-primary btn-lg" ((uC '9') +++ "0s")
                                       , bsButton "activityClock120s" "btn btn-primary btn-lg" "2m"
                                       , bsButton "activityClock180s" "btn btn-primary btn-lg" "3m"
                                       , bsButton "activityClock240s" "btn btn-primary btn-lg" "4m"
                                       , bsButton "activityClock300s" "btn btn-primary btn-lg" "5m" ]
     controlButtons                  = foldr (+++) noHtml $
-                                      [ bsButton "activityClockCustom" "btn btn-default btn-lg" ((underline << "C") +++ "ustom")
-                                      , bsButton "activityClockReset" "btn btn-default btn-lg" ((underline << "R") +++ "eset")]
+                                      [ bsButton "activityClockCustom" "btn btn-default btn-lg" (uC 'C' +++ "ustom")
+                                      , bsButton "activityClockReset" "btn btn-default btn-lg" (uC 'R' +++ "eset")]
 
 makeRightClockButtons :: Html
 makeRightClockButtons = primHtml $ "<a id=\"timeWastingClockGo\" class=\"btn btn-primary btn-lg btn-block\">Start <u>t</u>imer</a> <a id=\"timeWastingClockReset\" class=\"btn btn-default btn-lg btn-block\">Re<u>s</u>et timer </a>"
