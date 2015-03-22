@@ -27,7 +27,9 @@ scoreTimeWasted             :: Score -> Int
 scoreTimeWasted (Score _ x) = x
 
 deductPoints                  :: Int -> (Class, Score) -> (Class, Score)
-deductPoints n (c, Score x y) = (c, Score (x - n) y)
+deductPoints n (c, Score x y) = if   y > 0
+                                then (c, Score (x - n) y)
+                                else (c, Score x       y)
 
 resetTime                :: (Class, Score) -> (Class, Score)
 resetTime (c, Score x _) = (c, Score x 0)
