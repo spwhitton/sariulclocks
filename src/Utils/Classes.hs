@@ -1,6 +1,6 @@
 module Utils.Classes (rankings) where
 
-import Control.Monad.Page
+import Control.Monad.SariulClocks
 import Text.XHtml
 import Types.Session
 import Types.Classes
@@ -9,6 +9,7 @@ import Utils.Xhtml
 import Data.List (sortBy)
 import Data.Function (on)
 import Text.XHtml.Bootstrap
+import Control.Monad (liftM, liftM2)
 
 -- Make the columns with rankingColumns, and then transpose them so
 -- that we can make HTML.
@@ -21,45 +22,37 @@ import Text.XHtml.Bootstrap
 -- blue background colour for the current class and the winning two
 -- classes, not only the first row.
 
-rankings :: Page Html
+rankings'                    :: Maybe Class -> ScoresList -> ([Html], [Html], [Html])
+rankings' theClass theScores = foldr step ([], [], []) . sortBy (flip $ (compare `on` snd)) $ theScores
+  where
+    columnsBeforeWinners     = length theScores
+    step (thisClass, (Score points timeWasted)) (top, middle, bottom) =
+        let cell = if   Just thisClass == theClass
+                        then bootstrapCellClass "info"
+                        else if   columnsBeforeWinners - 2 <= length top
+                             then bootstrapCellClass "success"
+                             else td
+        in ( (cell << strong << (niceDashes . show) thisClass) : top
+           , (cell << show points) : middle
+           , ((if timeWasted >= 60 then bootstrapCellClass "danger" else cell) << secondsToTime timeWasted) : bottom )
+
+rankings :: SariulClocksCGI Html
 rankings = do
-    session <- getSession
-    scores <- getScores
+    (top, middle, bottom) <- liftM2 rankings' (liftM currentClass getSession) getScores
+
     return (thediv # "container" << thediv # "col-md-12" <<
-        table ! [htmlAttr "class" (noHtml +++ "table table-bordered table-centered table-chunky")]
-            << foldr (\row acc -> (tr << row) +++ acc) noHtml (rankings' (currentClass session) scores))
+            table # "table table-bordered table-centered table-chunky"
+            << ((tr << top) +++ (tr << middle) +++ (tr << bottom)))
 
 -- rankings                     :: Maybe Class -> ScoresList -> Html
 -- rankings currentClass scores = table ! [htmlAttr "class" (noHtml +++ "table table-bordered table-centered table-chunky")]
 --                                << foldr (\row acc -> (tr << row) +++ acc) noHtml (rankings' currentClass scores)
 
-rankings'                     :: Maybe Class -> ScoresList -> [Html]
-rankings' currentClass scores = foldr step [noHtml, noHtml, noHtml] (rankingColumns currentClass scores)
-  where
-    step (first, second, third) [firstRow, secondRow, thirdRow] =
-        [first +++ firstRow, second +++ secondRow, third +++ thirdRow]
-
-rankingColumns        :: Maybe Class -> ScoresList -> [(Html, Html, Html)]
-rankingColumns currentClass scores = fst $ foldr step ([], length sortedScores) sortedScores
-  where
-    sortedScores = reverse . sortBy (compare `on` snd) $ scores
-    step (thisClass, (Score points timeWasted)) (cols, count) =
-        (( (if count <= 2
-            then bootstrapCellClass "success"
-            else if   Just thisClass == currentClass
-                 then bootstrapCellClass "info"
-                 else bootstrapCellClass "warning")
-           << strong << (niceDashes . show) thisClass
-         , td << show points
-         , (if  timeWasted >= 60
-            then bootstrapCellClass "warning"
-            else td)
-           << secondsToTime timeWasted
-         ) : cols, count - 1)
-    maybeBorder aClass=
-        if   Just aClass == currentClass
-        then [htmlAttr "class" noHtml]
-        else undefined
+-- rankings'                     :: Maybe Class -> ScoresList -> [Html]
+-- rankings' currentClass scores = foldr step [noHtml, noHtml, noHtml] (rankingColumns currentClass scores)
+--   where
+--     step (first, second, third) [firstRow, secondRow, thirdRow] =
+--         [first +++ firstRow, second +++ secondRow, third +++ thirdRow]
 
 secondsToTime         :: Int -> String
 secondsToTime n       = minutes' ++ ":" ++ seconds'
