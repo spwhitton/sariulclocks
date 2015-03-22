@@ -37,8 +37,6 @@ fi
 cabal install --only-dependencies
 cabal configure
 cabal build
-# TODO: make this build actually work on ma!  Missing librt.  In the
-# meantime, manually copy sariulclocks.cgi into place from demeter.
 
 # 3. copy our software into place
 
@@ -49,7 +47,6 @@ if [ "$1" = "live" ]; then
     mkdir -p $HOME/local/bin
     cp dist/build/sariulccron/sariulccron $HOME/local/bin
 fi
-# TODO: add to demeter crontab (after devel gets merged to master)
 
 # 4. further permissions & dirs
 
@@ -62,6 +59,3 @@ if ! [ -e "$dest/password" ]; then
 fi
 chmod 777 $dest/data
 chmod 755 $dest/sariulclocks.cgi
-
-# TODO: also put script that resets clocks and deducts points at the
-# end of the week into ~/local/bin ready to be cronned
