@@ -60,7 +60,7 @@ lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" ("Start " +++ uC
                          -- +++ bsButton "end-of-week" "btn btn-default" "End of week"
 lessonButtons (Just _) = primHtml "<div class=\"form-group\"> <input id=\"class_points\" name=\"class_points\" type=\"text\" placeholder=\"Points scored\" class=\"form-control\"> </div> <div class=\"form-group\"> <input type=\"password\" id=\"teachers_password\" name=\"teachers_password\" placeholder=\"Teacher's password\" class=\"form-control\"> </div> "
                           +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""]
-                          +++ bsButton "end-lesson" "btn btn-success" "End lesson"
+                          +++ input #= "end-lesson" # "btn btn-success" ! [strAttr "value" "End lesson", strAttr "type" "submit"] +++ " "
                           +++ bsButton "lucky-number" "btn btn-danger" (uC 'L' +++ "ucky number")
 
 makeClockToggle   :: Clock -> Html
