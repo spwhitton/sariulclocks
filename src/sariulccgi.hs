@@ -22,6 +22,8 @@ import Utils.Xhtml
 import Network.URI
 import System.FilePath (takeDirectory)
 
+--- functions making HTML
+
 navBar :: SariulClocksCGI Html
 navBar = do
     currentClass <- liftM (currentClass) getSession
@@ -127,6 +129,8 @@ theDate = thediv # "container" << thediv # "row"
                         , strAttr "class" "text-center"]
                    << noHtml) +++ hr)
 
+--- main functions
+
 makePage :: SariulClocksCGI Html
 makePage = do
     theNavBar <- navBar
@@ -156,41 +160,23 @@ cgiMain = do
                               case cookieClock of
                                   0 -> CountDownClock
                                   1 -> CountUpClock }
-
     when passwordPasses $ modifyScores (updateScore (fromJust cookieClass) points timeWasted)
 
-    selfURL <- liftM (takeDirectory . uriPath) requestURI
-    if  passwordPasses
-        then do
-        -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
-        redirect selfURL
-        else do
-            page <- makePage
+    -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
+    selfURL <- liftM uriPath requestURI
+    page <- makePage
 
-            setCookie =<< liftM (makeClassCookie clockTime selfURL) getSession
-            setCookie =<< liftM (makeClockCookie clockTime selfURL) getSession
-            setCookie =<< liftM (makeSsCookie clockTime    selfURL) getSession
+    setCookie =<< liftM (makeClassCookie clockTime (takeDirectory selfURL)) getSession
+    setCookie =<< liftM (makeClockCookie clockTime (takeDirectory selfURL)) getSession
+    setCookie =<< liftM (makeSsCookie clockTime    (takeDirectory selfURL)) getSession
+    shouldModify <- liftM (((/=) scores) . Just) getScores
+    when shouldModify writeScoresFile
 
-            shouldModify <- liftM (((/=) scores) . Just) getScores
-            when shouldModify writeScoresFile
-
-            output $ templateInject htmlTemplate page
-
-  -- when (newScores /= scores) $ liftIO $ writeScoresFile newScores
-
--- main = runCGI . handleErrors $ cgiMain
-
--- tempMain :: New.SariulClocksCGI CGIResult
--- tempMain = do
---     readScoresFile
---     session <- New.getSession
---     let session' = session { currentClass = lookupSariulClass 5 1}
---     New.putSession session'
---     page <- rankings
---     htmlTemplate <- (liftIO . readFile) "html/main.html"
---     output $ templateInject htmlTemplate page
+    output $ templateInject htmlTemplate page
 
 main = runSariulClocksCGI cgiMain
+
+--- utility functions
 
 templateInject               :: String -> Html -> String
 templateInject template body = templateBefore ++ (renderHtmlFragment body) ++ templateAfter
