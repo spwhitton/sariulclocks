@@ -56,8 +56,9 @@ function createCookie(name,value,days) {
         var expires = "; expires="+date.toGMTString();
     }
     else var expires = "";
-    // TODO: make this not absolute
-    document.cookie = name+"="+value+expires+"; path=/sariul/cgi-bin";
+    var path = $(location).attr('pathname');
+    var dir = path.substring(0, path.lastIndexOf("/"));
+    document.cookie = name+"="+value+expires+"; path="+dir;
 }
 
 function readCookie(name) {

@@ -21,8 +21,8 @@ freshSession = Session { currentClass = Nothing
 -- Cookie where it uses the reader monad to get the CalendarTime and
 -- maybe the session from the state monad
 
-makeClassCookie             :: ClockTime -> Session -> Cookie
-makeClassCookie now session =
+makeClassCookie             :: ClockTime -> String -> Session -> Cookie
+makeClassCookie now path session =
     Cookie { cookieName     = "class_cookie"
            , cookieValue    =
                case currentClass session of
@@ -30,11 +30,11 @@ makeClassCookie now session =
                    Nothing -> "Nothing"
            , cookieExpires  = Just $ endOfSchoolDay now
            , cookieDomain   = Nothing
-           , cookiePath     = Just "/sariul/cgi-bin"
+           , cookiePath     = Just path
            , cookieSecure   = False}
 
-makeClockCookie             :: ClockTime -> Session -> Cookie
-makeClockCookie now session =
+makeClockCookie             :: ClockTime -> String -> Session -> Cookie
+makeClockCookie now path session =
     Cookie { cookieName     = "clock_cookie"
            , cookieValue    =
                case currentClock session of
@@ -42,11 +42,11 @@ makeClockCookie now session =
                    CountUpClock   -> "1"
            , cookieExpires  = Just $ endOfSchoolDay now
            , cookieDomain   = Nothing
-           , cookiePath     = Just "/sariul/cgi-bin"
+           , cookiePath     = Just path
            , cookieSecure   = False}
 
-makeSsCookie               :: ClockTime -> Session -> Cookie
-makeSsCookie now session =
+makeSsCookie               :: ClockTime -> String -> Session -> Cookie
+makeSsCookie now path session =
     Cookie { cookieName    = "ss_cookie"
            , cookieValue    =
                case currentClass session of
@@ -55,7 +55,7 @@ makeSsCookie now session =
            , cookieExpires = Just $ endOfSchoolDay now
            , cookieDomain  = Nothing
 -- make the cookie path not absolute
-           , cookiePath    = Just "/sariul/cgi-bin"
+           , cookiePath    = Just path
            , cookieSecure  = False}
 
 endOfSchoolDay       :: ClockTime -> CalendarTime
