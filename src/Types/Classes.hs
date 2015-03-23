@@ -32,8 +32,8 @@ getModifier                           :: Class -> Float
 getModifier (Class (GradeFive m) _ _) = m
 getModifier (Class (GradeSix  m) _ _) = m
 
-updateScore          :: ScoresList -> Class -> Int -> Int -> ScoresList
-updateScore [] _ _ _ = []
-updateScore (s@(aClass, Score x y):ss) c p t
+updateScore          :: Class -> Int -> Int -> ScoresList -> ScoresList
+updateScore _ _ _ [] = []
+updateScore c p t (s@(aClass, Score x y):ss)
     | c == aClass    = (c, Score (x + (floor $ (fromIntegral p) * (getModifier aClass))) (y + t)):ss
-    | otherwise      = s:updateScore ss c p t
+    | otherwise      = s:updateScore c p t ss

@@ -1,6 +1,5 @@
 import Data.Text (strip, unpack, pack)
 import Network.CGI
--- import Network.CGI.Monad
 import Text.XHtml
 import Utils.ScoresFile (readScoresFile,writeScoresFile)
 import Types.Classes
@@ -13,15 +12,17 @@ import Control.Monad.Trans (lift)
 import Data.Maybe (fromMaybe)
 import Types.Session
 import Types.Clocks
-import Control.Monad.Page
+import Control.Monad.SariulClocks
 import Utils.Classes
 import Text.XHtml.Bootstrap
 import Control.Exception (onException)
 import Data.Char (isDigit)
 import Data.Maybe (fromJust)
 import Utils.Xhtml
+import Network.URI
+import System.FilePath (takeDirectory)
 
-navBar :: Page Html
+navBar :: SariulClocksCGI Html
 navBar = do
     currentClass <- liftM (currentClass) getSession
     return $
@@ -89,7 +90,7 @@ makeLeftClockButtons CountDownClock = br +++ (paragraph # "text-center" << timeB
 makeRightClockButtons :: Html
 makeRightClockButtons = primHtml $ "<a id=\"timeWastingClockGo\" class=\"btn btn-primary btn-lg btn-block\">Start <u>t</u>imer</a> <a id=\"timeWastingClockReset\" class=\"btn btn-default btn-lg btn-block\">Re<u>s</u>et timer </a>"
 
-clocks :: Page Html
+clocks :: SariulClocksCGI Html
 clocks = do
     leftClockType <- liftM (currentClock) getSession
     let leftClockToggle = makeClockToggle leftClockType
@@ -126,70 +127,70 @@ theDate = thediv # "container" << thediv # "row"
                         , strAttr "class" "text-center"]
                    << noHtml) +++ hr)
 
--- forms :: Page Html
--- forms = do
---     let html = form #= "end_of_class_form" ! [strAttr "method" "POST"] << (input #= "class_points" ! [strAttr "name" "class_points", strAttr "type" "hidden", strAttr "value" ""] +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""])
---     return html
-
-makePage :: Page Html
+makePage :: SariulClocksCGI Html
 makePage = do
     theNavBar <- navBar
     theClocks <- clocks
     theRankings <- rankings
     return (theNavBar +++ theClocks +++ theDate +++ theRankings)
 
-cgiMain :: CGI CGIResult
+cgiMain :: SariulClocksCGI CGIResult
 cgiMain = do
     -- preparatory IO: templating, scores file, time (for cookies)
 
     password <- (liftIO . readFile) "password"
     userPassword <- liftM (fromMaybe "") $ getInput "teachers_password"
+    let passwordPasses = (unpack . strip . pack) password == userPassword
+
     htmlTemplate <- (liftIO . readFile) "html/main.html"
-    maybeScores <- liftIO readScoresFile
-    let scores = case maybeScores of
-            Just s -> s
-            _      -> zeroScores
-
     clockTime <- liftIO getClockTime
+    scores <- readScoresFile
 
-    points <- liftM (fromMaybe "0") $ getInput "class_points"
-    timeWasted <- liftM (fromMaybe "0") $ getInput "class_time_wasted"
-    let points' = readInt points
-    let timeWasted' = readInt timeWasted
-
+    points <- liftM (readInt . fromMaybe "0") $ getInput "class_points"
+    timeWasted <- liftM (readInt . fromMaybe "0") $ getInput "class_time_wasted"
     cookieClock <- liftM (fromMaybe 0) $ readCookie "clock_cookie"
     cookieClass <- liftM (parseClassCookie) $ getCookie "class_cookie"
 
-    let session = Session { currentClass = if points' /= 0 && userPassword == (unpack . strip . pack) password then Nothing else cookieClass
-                          , currentClock =
+    putSession Session { currentClass = if passwordPasses then Nothing else cookieClass
+                       , currentClock =
                               case cookieClock of
                                   0 -> CountDownClock
-                                  1 -> CountUpClock}
+                                  1 -> CountUpClock }
 
-    -- now do our CGI work
+    when passwordPasses $ modifyScores (updateScore (fromJust cookieClass) points timeWasted)
 
-    -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
+    selfURL <- liftM (takeDirectory . uriPath) requestURI
+    if  passwordPasses
+        then do
+        -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
+        redirect selfURL
+        else do
+            page <- makePage
 
-    -- TODO: restore time wasting clock if password was wrong
+            setCookie =<< liftM (makeClassCookie clockTime selfURL) getSession
+            setCookie =<< liftM (makeClockCookie clockTime selfURL) getSession
+            setCookie =<< liftM (makeSsCookie clockTime    selfURL) getSession
 
-    let scores' =
-            if   points' /= 0 && userPassword == (unpack . strip . pack) password
-            then updateScore scores (fromJust cookieClass) points' timeWasted'
-            else scores
+            shouldModify <- liftM (((/=) scores) . Just) getScores
+            when shouldModify writeScoresFile
 
-    let (newScores, newSession, html) = runPage makePage scores' session
+            output $ templateInject htmlTemplate page
 
-    setCookie $ makeClassCookie clockTime newSession
-    setCookie $ makeClockCookie clockTime newSession
-    setCookie $ makeSsCookie clockTime newSession
+  -- when (newScores /= scores) $ liftIO $ writeScoresFile newScores
 
-    -- let html' = html +++ show points' +++ show timeWasted'
+-- main = runCGI . handleErrors $ cgiMain
 
-    when (newScores /= scores) $ liftIO $ writeScoresFile newScores
+-- tempMain :: New.SariulClocksCGI CGIResult
+-- tempMain = do
+--     readScoresFile
+--     session <- New.getSession
+--     let session' = session { currentClass = lookupSariulClass 5 1}
+--     New.putSession session'
+--     page <- rankings
+--     htmlTemplate <- (liftIO . readFile) "html/main.html"
+--     output $ templateInject htmlTemplate page
 
-    output $ templateInject htmlTemplate html
-
-main = runCGI . handleErrors $ cgiMain
+main = runSariulClocksCGI cgiMain
 
 templateInject               :: String -> Html -> String
 templateInject template body = templateBefore ++ (renderHtmlFragment body) ++ templateAfter
