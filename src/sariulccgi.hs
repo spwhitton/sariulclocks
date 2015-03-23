@@ -162,7 +162,12 @@ cgiMain = do
                                   1 -> CountUpClock }
     when passwordPasses $ modifyScores (updateScore (fromJust cookieClass) points timeWasted)
 
-    -- TODO: use POST,REDIRECT,GET https://stackoverflow.com/questions/570015/how-do-i-reload-a-page-without-a-postdata-warning-in-javascript/570069#570069
+    -- It would be good to use POST,REDIRECT,GET
+    -- <http://stackoverflow.com/a/570069> here.  However, you can't
+    -- reliably set cookies during a 302 redirect: a lot of browsers
+    -- cough on it.  So we'd have to change lots of things about our
+    -- application to make this work.
+
     selfURL <- liftM uriPath requestURI
     page <- makePage
 
