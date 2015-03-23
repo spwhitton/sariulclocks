@@ -53,7 +53,7 @@ navBar = do
                       +++ (li << anchor #= "why-so-noisy" ! [strAttr "href" "#"] << "Why are you so noisy?")))
 
 lessonButtons          :: Maybe Class -> Html
-lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" "Start lesson"
+lessonButtons Nothing  = bsButton "start-lesson" "btn btn-info" ("Start " +++ uC 'l' +++ "esson")
                          -- +++ bsButton "end-of-week" "btn btn-default" "End of week"
 lessonButtons (Just _) = primHtml "<div class=\"form-group\"> <input id=\"class_points\" name=\"class_points\" type=\"text\" placeholder=\"Points scored\" class=\"form-control\"> </div> <div class=\"form-group\"> <input type=\"password\" id=\"teachers_password\" name=\"teachers_password\" placeholder=\"Teacher's password\" class=\"form-control\"> </div> "
                           +++ input #= "class_time_wasted" ! [strAttr "name" "class_time_wasted", strAttr "type" "hidden", strAttr "value" ""]

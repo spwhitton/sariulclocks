@@ -340,6 +340,8 @@ if ($("#time-wasting-clock").length)
     // $(document).bind('keydown', 'space', timeWastingClock.toggle);
     $(document).bind('keydown', 'l', luckyNumber);
 }
+else
+    $(document).bind('keydown', 'l', startLesson);
 
 $(document).bind('keydown', 's', timeWastingClock.reset);
 $(document).bind('keydown', 'r', activityClock.reset);
