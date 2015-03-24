@@ -13,6 +13,9 @@ $.ionSound({
             name: "button_tiny",
         },
         {
+            name: "bell_ring",
+        },
+        {
             name: "cheonjae",
         },
         {
@@ -38,6 +41,40 @@ $.ionSound({
     path: "sounds/",
     preload: true
 });
+
+// Play a sound three minutes before the end of each lesson.
+
+var loaded = new Date();
+var loadedYear = loaded.getYear();
+var loadedMonth = loaded.getMonth();
+var loadedDay = loaded.getDay();
+var lessonEndWarningTimes = [[9,  37],
+                             [10, 27],
+                             [11, 17],
+                             [12,  7],
+                             [13, 37],
+                             [14, 27]];
+
+function watchEndOfLesson ()
+{
+    var now = new Date();
+    var hours = now.getHours()
+    var minutes = now.getMinutes()
+    for (var i = 0; i < lessonEndWarningTimes.length; i++)
+    {
+        if (lessonEndWarningTimes[i][0] == hours && lessonEndWarningTimes[i][1] == minutes)
+        {
+            $.ionSound.play("bell_ring");
+            break;
+        }
+    }
+}
+
+// At the next top of the minute, start checking for three minutes
+// before the end of the lesson.
+
+var startWatching = 1000 - loaded.getMilliseconds() + 1000 * (60 - loaded.getSeconds())
+window.setTimeout(function () { watchEndOfLesson(); window.setInterval(watchEndOfLesson, 60000); }, startWatching);
 
 // random integers
 
