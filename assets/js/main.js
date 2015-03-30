@@ -304,8 +304,9 @@ timeWastingClock.reset = $.proxy(function () {
                 this.stop();
                 this.running = false;
             }
-            $.jStorage.set('time_wasted', 0);
-            this.setTime(0);
+        $.jStorage.set('time_wasted', 0);
+        $("#class_time_wasted").val(0);
+        this.setTime(0);
         // }
     }
 }, timeWastingClock);
