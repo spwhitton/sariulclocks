@@ -291,6 +291,7 @@ var timeWastingClock = MyFlipClock($('#time-wasting-clock'), {
     }
 });
 timeWastingClock.setTime($.jStorage.get("time_wasted", 0));
+$("#class_time_wasted").val($.jStorage.get("time_wasted", 0));
 
 timeWastingClock.running = false;
 timeWastingClock.reset = $.proxy(function () {
