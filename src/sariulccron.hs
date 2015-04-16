@@ -18,7 +18,7 @@ import           Utils.ScoresFile
 --- meaty functions
 
 weeklyCron        :: ScoresList -> ScoresList
-weeklyCron scores = ((resetTime . deductPoints 10) <$> take 3 sortedScores)
+weeklyCron scores = ((resetTime . deductPoints 20) <$> take 3 sortedScores)
                     ++ (resetTime <$> drop 3 sortedScores)
   where
     sortedScores  = sortBy (flip $ (compare `on` (scoreTimeWasted . snd))) scores
